@@ -66,11 +66,48 @@ public class ListProb {
         return null;
     }
 
+    /**
+     * Offer22倒数第K个节点
+     */
+    public ListNode getKthFromEnd(ListNode head, int k) {
+        ListNode tmp = head;
+        int num = 0;
+        while (tmp != null){
+            tmp = tmp.next;
+            num ++;
+        }
+        tmp = head;
+        for (int i = 0; i < num - k; i++) {
+            tmp = tmp.next;
+        }
+        return tmp;
+    }
 
+    /**
+     * Offer24 反转链表
+     * 方法一：头插法
+     */
+    public ListNode reverseList(ListNode head) {
+        ListNode head_new = null;
+        ListNode tmp1 = head, tmp2;
+        while (tmp1 != null){
+            tmp2 = tmp1.next;
+            tmp1.next = head_new;
+            head_new = tmp1;
+            tmp1 = tmp2;
+        }
+        return head_new;
+    }
 
+    //反转列表，方法二：递归法（难）
+    public ListNode reverseList2(ListNode head) {
+        return null;
+    }
 
-
-
+    //反转链表升级版 -> 反转链表の前 N 个节点，（n <= 链表长度），同样可以使用方法：递归法（难）
+    public ListNode reverseListN(ListNode head, int n) {
+        return null;
+    }
 
 
 
