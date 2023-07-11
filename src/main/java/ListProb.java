@@ -1,5 +1,10 @@
+import org.graalvm.compiler.replacements.nodes.ReverseBytesNode;
+
 import java.time.temporal.Temporal;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 public class ListProb {
@@ -176,7 +181,7 @@ public class ListProb {
     }
 
     /**
-     * Leecode 25. K 个一组翻转链表（难！）
+     * Leecode 25. K 个一组翻转链表
      */
     public ListNode reverseKGroup(ListNode head, int k) {
 
@@ -195,6 +200,101 @@ public class ListProb {
             return  head;
         }
     }
+
+    /**
+     * Offer52 两个链表的第一个公共节点 / Leecode 160. 相交链表
+     * 指针相遇法，
+     * 时间复杂度：O(a + b)
+     * 空间复杂夫：O(1)
+     * 这里没有考虑到没有交点的情况
+     */
+    ListNode getIntersectionNode(ListNode headA, ListNode headB) {
+        ListNode a = headA, b = headB;
+        while (a != b){
+            a = a == null ? headA : a.next;
+            b = b == null ? headB : b.next;
+        }
+        return b;
+    }
+
+
+    /**
+     * Leecode 面试题02.05 / Leecode 2. 两数相加
+     * 链表求和：个位排在链表首部
+     */
+    public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
+        ListNode a = l1, b = l2;
+        int c = 0;
+        ListNode head = new ListNode();
+        ListNode tmp = head;
+        while (a != null || b != null){
+            if (a !=null){
+                c += a.val;
+                a = a.next;
+            }
+            if (b != null){
+                c += b.val;
+                b = b.next;
+            }
+            tmp.next = new ListNode(c % 10);
+            tmp = tmp.next;
+            c = c / 10;
+        }
+        if (c != 0){
+            tmp.next = new ListNode(c);
+        }
+        return head.next;
+    }
+
+
+    /**
+     * 剑指 Offer II 025. 链表中的两数相加 / Leecode 445. 两数相加 II
+     * 链表求和：个位排在链表尾部
+     * 不要想着用long 来存储链表数字已经超过最大存储范围
+     */
+    public ListNode addTwoNumbers2(ListNode l1, ListNode l2) {
+        return null;
+    }
+
+    /**
+     * Leecode 234
+     * 回文链表
+     */
+    public boolean isPalindrome(ListNode head) {
+
+        return true;
+    }
+
+
+    /**
+     * Leecode 61 旋转链表
+     *
+     * 将链表每个节点向右移动 k 个位置。
+     */
+    public ListNode rotateRight(ListNode head, int k) {
+        if (head == null)
+            return head;
+        ListNode tmp = head, tail = new ListNode();
+        int num = 0;
+        while (tmp != null){
+            if (tmp.next == null)
+                tail = tmp;
+            num ++;
+            tmp = tmp.next;
+        }
+        if (num - k == 0)
+            return head;
+        int node = num - (k % num);
+        tmp = head;
+        while (node-- > 1){
+            tmp = tmp.next;
+        }
+        tail.next = head;
+        head = tmp.next;
+        tmp.next = null;
+        return head;
+    }
+
 
 
     public static class ListNode{
