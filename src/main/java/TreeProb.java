@@ -1,7 +1,4 @@
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Stack;
+import java.util.*;
 
 public class TreeProb {
 
@@ -61,10 +58,26 @@ public class TreeProb {
     /**
      * Leecode 94
      * 二叉树的中序遍历 左中右
-     * 非递归
+     * 非递归：栈 + 一个变量
      */
     public List<Integer> inorderTraversal2(TreeNode root) {
-
+        Stack<TreeNode> stack = new Stack<>();
+        ArrayList<Integer> res = new ArrayList<>();
+        if (root == null)
+            return res;
+        TreeNode p = root;
+        while ( p != null || !stack.isEmpty()){
+            //将p以及p的左节点全部压栈
+            while (p !=null){
+                stack.add(p);
+                p = p.left;
+            }
+            //每一轮出一个节点
+            TreeNode temp = stack.pop();
+            res.add(temp.val);
+            p = temp.right;
+        }
+        return res;
     }
 
     /**
@@ -80,6 +93,58 @@ public class TreeProb {
         res.add(root.val);
         return res;
     }
+
+    /**
+     * Leecode 145
+     * 二叉树的后序遍历 左右中
+     * 非递归：两个栈
+     */
+    public List<Integer> postorderTraversal2(TreeNode root) {
+        LinkedList<Integer> res = new LinkedList<>();
+        if (root == null)
+            return res;
+        Stack<TreeNode> stack = new Stack<>();
+        stack.add(root);
+        while (!stack.isEmpty()){
+            TreeNode node = stack.pop();
+            if (node.left != null)
+                stack.add(node.left);
+            if (node.right != null)
+                stack.add(node.right);
+            res.addFirst(node.val);
+        }
+        return res;
+    }
+
+    /**
+     * Leecode 102. 二叉树的层序遍历
+     */
+    public List<List<Integer>> levelOrder(TreeNode root) {
+        ArrayList<List<Integer>> res = new ArrayList<>();
+        if (root == null) {
+            return res;
+        }
+        LinkedList<TreeNode> queue = new LinkedList<>();
+        ArrayList<Integer> list;
+        queue.add(root);
+        int levelNum = 1;
+        TreeNode tmp;
+        while (!queue.isEmpty()){
+             list = new ArrayList<>();
+            while (levelNum -- >0){
+                tmp = queue.removeFirst();
+                list.add(tmp.val);
+                if (tmp.left != null)
+                    queue.addLast(tmp.left);
+                if (tmp.right != null)
+                    queue.addLast(tmp.right);
+            }
+            levelNum = queue.size();
+            res.add(list);
+        }
+        return res;
+    }
+
 
     class TreeNode{
         int val;
