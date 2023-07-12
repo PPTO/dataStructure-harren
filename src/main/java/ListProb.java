@@ -1,5 +1,3 @@
-import org.graalvm.compiler.replacements.nodes.ReverseBytesNode;
-
 import java.time.temporal.Temporal;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -128,16 +126,12 @@ public class ListProb {
 
     //反转列表，方法二：递归法（难，ok）
     public ListNode reverseList2(ListNode head) {
-        if (head == null){
-            return null;
-        }
-        if (head.next == null)
+        if (head == null || head.next == null)
             return head;
-        ListNode node = reverseList2(head.next);
-        if (head.next != null)
-            head.next.next = head;
+        ListNode node = reverseList3(head.next);
+        head.next.next = head;
         head.next = null;
-        return node;
+        return  node;
     }
 
     //反转链表升级版 -> 反转链表の前 N 个节点，（n <= 链表长度），同样可以使用方法：递归法（难，ok）
@@ -251,18 +245,46 @@ public class ListProb {
      * 剑指 Offer II 025. 链表中的两数相加 / Leecode 445. 两数相加 II
      * 链表求和：个位排在链表尾部
      * 不要想着用long 来存储链表数字已经超过最大存储范围
+     * 空间复杂度：O(1), 时间复杂度：O(n)
      */
     public ListNode addTwoNumbers2(ListNode l1, ListNode l2) {
-        return null;
+        ListNode head1 = reverseList3(l1);
+        ListNode head2 = reverseList3(l2);
+        ListNode res = addTwoNumbers(head1, head2);
+        ListNode listNode = reverseList3(res);
+        return listNode;
     }
 
     /**
      * Leecode 234
      * 回文链表
+     * 时间复杂度：o(n)，空间复杂度：o(1)
+     * 技巧：通过快慢指针找链表中点
      */
     public boolean isPalindrome(ListNode head) {
-
+        ListNode quick = head, slow = head, mid, tmp;
+        while (quick != null && quick.next != null){
+            quick = quick.next.next;
+            slow = slow.next;
+        }
+        mid = quick == null ? slow : slow.next;
+        ListNode node = reverseList3(mid);
+        while (node != null){
+            if (node.val == head.val){
+                node = node.next;
+                head = head.next;
+            }
+            else return false;
+        }
         return true;
+    }
+    private ListNode reverseList3(ListNode head){
+        if (head == null || head.next == null)
+            return head;
+        ListNode node = reverseList3(head.next);
+        head.next.next = head;
+        head.next = null;
+        return  node;
     }
 
 
@@ -295,6 +317,109 @@ public class ListProb {
         return head;
     }
 
+    /**
+     * Leecode 141
+     * 环形链表
+     * plan: 快慢指针
+     */
+    public boolean hasCycle(ListNode head) {
+        if (head == null || head.next == null)
+            return false;
+        ListNode fast = head.next.next, slow = head.next;
+        while (fast != slow){
+            if (fast == null || fast.next == null)
+                return false;
+            fast = fast.next.next;
+            slow = slow.next;
+        }
+        return true;
+    }
+
+
+    /**
+     * Leecode 142
+     * 环形链表 II ： 找到环形链表的第一个节点
+     * 2(a + b) = a + 2b + c
+     */
+    public ListNode detectCycle(ListNode head) {
+        if (head == null || head.next == null)
+            return null;
+        ListNode fast = head.next.next, slow = head.next;
+        while (fast != slow){
+            if (fast == null || fast.next == null)
+                return null;
+            fast = fast.next.next;
+            slow = slow.next;
+        }
+        slow = head;
+        while (slow != fast){
+            slow = slow.next;
+            fast = fast.next;
+        }
+        return fast;
+    }
+
+    /**
+     * Offer25 / Leecode 21 合并两个有序链表
+     */
+    public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
+        ListNode head = new ListNode();
+        ListNode tmp = head;
+        while ( l1 != null && l2 != null){
+            if (l1.val <= l2.val){
+                tmp.next = l1;
+                l1 = l1.next;
+            }
+            else {
+                tmp.next = l2;
+                l2 = l2.next;
+            }
+            tmp = tmp.next;
+        }
+        tmp.next = l1 != null ? l1 : l2;
+        return head.next;
+    }
+
+    /**
+     * Offer25 / Leecode 21 合并两个有序链表
+     * plan: 递归
+     */
+    public ListNode mergeTwoLists2(ListNode l1, ListNode l2) {
+        return null;
+    }
+
+
+    /**
+     * Leecode 23. 合并K个升序链表
+     */
+    public ListNode mergeKLists(ListNode[] lists) {
+        if (lists ==null || lists.length == 0)
+            return null;
+        int length = lists.length;
+        ListNode head = new ListNode();
+        ListNode node = head;
+        while (length != 0){
+            ListNode tmp = new ListNode(Integer.MAX_VALUE);
+            int num = -1;
+            for (int i = 0; i < lists.length; i++) {
+                if (lists[i] != null && lists[i].val <tmp.val){
+                    tmp = lists[i];
+                    num = i;
+                }
+            }
+            if (tmp.val == Integer.MAX_VALUE)
+                break;
+            node.next = tmp;
+            node = node.next;
+            if (tmp.next == null)
+                length--;
+            lists[num] = tmp.next;
+        }
+        return head.next;
+    }
+
+
+
 
 
     public static class ListNode{
@@ -308,15 +433,20 @@ public class ListProb {
     public static void main(String[] args) {
         ListProb listProb = new ListProb();
         ListNode a = new ListNode(1);
-        ListNode b = new ListNode(2);
-        ListNode c = new ListNode(3);
-        ListNode d = new ListNode(4);
-        ListNode e = new ListNode(5);
+        ListNode b = new ListNode(4);
+        ListNode c = new ListNode(5);
         a.next = b;
         b.next = c;
-        c.next = d;
-        d.next = e;
-        listProb.reverseKGroup(a, 2);
+        ListNode e = new ListNode(1);
+        ListNode f = new ListNode(3);
+        ListNode g = new ListNode(4);
+        e.next = f;
+        f.next = g;
+        ListNode h = new ListNode(2);
+        ListNode i = new ListNode(6);
+        h.next = i;
+        ListNode[] res=new ListNode[]{a,e,h};
+        listProb.mergeKLists(res);
 
     }
 }
