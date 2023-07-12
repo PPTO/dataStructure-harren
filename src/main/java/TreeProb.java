@@ -117,7 +117,8 @@ public class TreeProb {
     }
 
     /**
-     * Leecode 102. 二叉树的层序遍历
+     * Leecode 102. 二叉树的层序遍历 / 剑指 Offer 32 - II. 从上到下打印二叉树 II
+     * plan: 非递归
      */
     public List<List<Integer>> levelOrder(TreeNode root) {
         ArrayList<List<Integer>> res = new ArrayList<>();
@@ -144,6 +145,11 @@ public class TreeProb {
         }
         return res;
     }
+
+    /**
+     * Leecode 102. 二叉树的层序遍历 / 剑指 Offer 32 - II. 从上到下打印二叉树 II
+     * plan: 递归
+     */
 
     /**
      * Offer27
@@ -175,6 +181,10 @@ public class TreeProb {
             return false;
         return isSymmetric(left.left, right.right) && isSymmetric(left.right, right.left);
     }
+
+
+
+
 
 
 
