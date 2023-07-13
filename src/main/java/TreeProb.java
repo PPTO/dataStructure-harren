@@ -147,9 +147,26 @@ public class TreeProb {
     }
 
     /**
-     * Leecode 102. 二叉树的层序遍历 / 剑指 Offer 32 - II. 从上到下打印二叉树 II
+     * Leecode 102. 二叉树的层序遍历 / 剑指 Offer 32 - II. 从上到下打印二叉树 II (难！)
      * plan: 递归
+     * 注意. 该递归方法仅适用于结果返回值为 List<List<>> 时。
      */
+    public List<List<Integer>> levelOrder2(TreeNode root) {
+        List<List<Integer>> res = new ArrayList<>();
+        if (root == null)
+            return res;
+        levelOrder(root, res, 0);
+        return res;
+    }
+    public void levelOrder(TreeNode root, List<List<Integer>> res, int level){
+        if (res.size() == level)
+            res.add(level,new ArrayList<>());
+        res.get(level).add(root.val);
+        if (root.left != null)
+            levelOrder(root.left, res, level + 1);
+        if (root.right != null)
+            levelOrder(root.right, res, level + 1);
+    }
 
     /**
      * Offer27

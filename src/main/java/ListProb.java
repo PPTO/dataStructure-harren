@@ -381,13 +381,23 @@ public class ListProb {
     }
 
     /**
-     * Offer25 / Leecode 21 合并两个有序链表
+     * Offer25 / Leecode 21 合并两个有序链表（难！）
      * plan: 递归
      */
     public ListNode mergeTwoLists2(ListNode l1, ListNode l2) {
-        return null;
+        if (l1 == null || l2 == null)
+            return l1 == null ? l2 : l1;
+        ListNode tmp;
+        if (l1.val <= l2.val){
+            tmp = l1;
+            l1.next = mergeTwoLists2(l1.next, l2);
+        }
+        else {
+            tmp = l2;
+            l2.next = mergeTwoLists2(l1, l2.next);
+        }
+        return tmp;
     }
-
 
     /**
      * Leecode 23. 合并K个升序链表
@@ -417,6 +427,15 @@ public class ListProb {
         }
         return head.next;
     }
+
+
+
+
+
+
+
+
+
 
 
 
