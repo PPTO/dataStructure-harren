@@ -1,4 +1,6 @@
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class TreeProb {
 
@@ -117,7 +119,7 @@ public class TreeProb {
     }
 
     /**
-     * Leecode 102. 二叉树的层序遍历 / 剑指 Offer 32 - II. 从上到下打印二叉树 II
+     * Leecode 102. 二叉树的层序遍历 / 剑指 Offer 32 - II.
      * plan: 非递归
      */
     public List<List<Integer>> levelOrder(TreeNode root) {
@@ -147,11 +149,11 @@ public class TreeProb {
     }
 
     /**
-     * Leecode 102. 二叉树的层序遍历 / 剑指 Offer 32 - II. 从上到下打印二叉树 II (难！)
+     * Leecode 102. 二叉树的层序遍历 / 剑指 Offer 32 - II.
      * plan: 递归
      * 注意. 该递归方法仅适用于结果返回值为 List<List<>> 时。
      */
-    public List<List<Integer>> levelOrder2(TreeNode root) {
+    public List<List<Integer>> levelOrder1(TreeNode root) {
         List<List<Integer>> res = new ArrayList<>();
         if (root == null)
             return res;
@@ -167,6 +169,74 @@ public class TreeProb {
         if (root.right != null)
             levelOrder(root.right, res, level + 1);
     }
+
+    /**
+     * 剑指 Offer 32 - I. 从上到下打印二叉树
+     */
+    public int[] levelOrder2(TreeNode root) {
+        if (root == null)
+            return  new int[0];
+        ArrayList<Integer> res = new ArrayList<>();
+        LinkedList<TreeNode> queue = new LinkedList<>();
+        int level = 1;
+        queue.add(root);
+        while (!queue.isEmpty()){
+            int newLevel = 0;
+            for (int i = 0; i < level; i++) {
+                TreeNode node = queue.remove();
+                res.add(node.val);
+                if (node.left != null){
+                    queue.add(node.left);
+                    newLevel++;
+                }
+                if (node.right != null){
+                    queue.add(node.right);
+                    newLevel++;
+                }
+            }
+            level = newLevel;
+        }
+        return res.stream().mapToInt(Integer::intValue).toArray();
+    }
+
+    /**
+     * 剑指 Offer 32 - III. 二叉树层序遍历（难!）
+     * 左->右
+     * 右->左
+     * 左->右
+     */
+    public List<List<Integer>> levelOrder3(TreeNode root) {
+        List<List<Integer>> res = new ArrayList<>();
+        if (root == null)
+            return res;
+        int flag = 0;
+        LinkedList<TreeNode> queue = new LinkedList<>();
+        queue.add(root);
+        int level = 1;
+        while (!queue.isEmpty()){
+            ArrayList<Integer> list = new ArrayList<>();
+            while (level-- >0){
+                TreeNode node = queue.remove();
+                list.add(node.val);
+                if (node.left != null)
+                    queue.add(node.left);
+                if (node.right != null)
+                    queue.add(node.right);
+            }
+            level = queue.size();
+            if (flag == 1)
+                Collections.reverse(list);
+            res.add(list);
+            flag = (flag + 1) % 2;
+        }
+        return res;
+    }
+
+
+
+
+
+
 
     /**
      * Offer27
