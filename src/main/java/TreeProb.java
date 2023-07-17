@@ -1,3 +1,4 @@
+import javax.swing.*;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -232,12 +233,6 @@ public class TreeProb {
         return res;
     }
 
-
-
-
-
-
-
     /**
      * Offer27
      * 二叉树的镜像
@@ -269,6 +264,159 @@ public class TreeProb {
         return isSymmetric(left.left, right.right) && isSymmetric(left.right, right.left);
     }
 
+    /**
+     *Offer54 二叉搜索树的第k大节点
+     * 中序遍历
+     */
+    private int KthRes, k;
+    public int kthLargest(TreeNode root, int k) {
+        this.k = k;
+        inorder(root);
+        return KthRes;
+    }
+    private void inorder(TreeNode root){
+        if (root.right != null)
+            inorder(root.right);
+        k--;
+        if (k == 0){
+            KthRes = root.val;
+            return;
+        }
+        if (root.left != null){
+            inorder(root.left);
+        }
+    }
+
+    /**
+     * Offer 55 - I. 二叉树的深度
+     */
+    public int maxDepth(TreeNode root) {
+        int depth = 0;
+        if (root == null) {
+            return depth;
+        }
+        LinkedList<TreeNode> queue = new LinkedList<>();
+        queue.add(root);
+        while (!queue.isEmpty()){
+            int size = queue.size();
+            while (size-- >0){
+                TreeNode node = queue.remove();
+                if (node.left != null)
+                    queue.add(node.left);
+                if (node.right != null)
+                    queue.add(node.right);
+            }
+            depth++;
+        }
+        return depth;
+    }
+
+    /**
+     * Offer 55 - II. 平衡二叉树
+     */
+    private boolean balanceFlag = true;
+    public boolean isBalanced(TreeNode root) {
+        if (root == null)
+            return true;
+        judgeBalanced(root);
+        return balanceFlag;
+    }
+
+    /**
+     * @return root 的深度
+     * 后序遍历
+     */
+    private int judgeBalanced(TreeNode root){
+        int i = 0, j = 0;
+        if (root.left != null){
+            i = judgeBalanced(root.left);
+        }
+        if (root.right != null){
+            j = judgeBalanced(root.right);
+        }
+        if (Math.abs(i - j) >1)
+            balanceFlag = false;
+        return Math.max(i, j) + 1;
+    }
+
+    /**
+     *  Offer 68 - I. 二叉搜索树的最近公共祖先
+     */
+    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+        TreeNode low = p.val > q.val? q : p;
+        TreeNode high= p.val > q.val? p : q;
+        if (root.val >= low.val && root.val <= high.val)
+            return root;
+        TreeNode node;
+        if (high.val < root.val) {
+            node = lowestCommonAncestor(root.left, p, q);
+        }
+        else {
+           // p.val > root.val
+            node = lowestCommonAncestor(root.right, p, q);
+        }
+        return node;
+    }
+
+    /**
+     * Offer 68 - II. 二叉树的最近公共祖先（难！）
+     */
+    public TreeNode lowestCommonAncestor1(TreeNode root, TreeNode p, TreeNode q) {
+        if (root == null)
+            return null;
+        if (root.val == p.val || root.val == q.val)
+            return root;
+        TreeNode left = lowestCommonAncestor1(root.left, p, q);
+        TreeNode right = lowestCommonAncestor1(root.right, p, q);
+
+
+        return null;
+    }
+
+    /**
+     * Offer 26. 树的子结构（难！）
+     */
+    public boolean isSubStructure(TreeNode A, TreeNode B) {
+        if (A == null && B == null)
+            return true;
+        if (A == null || B == null)
+            return false;
+        if (A.val == B.val){
+            boolean i = isSubStructure(A.left, B.left);
+            boolean j = isSubStructure(A.right, B.right);
+            return i && j;
+        }
+        else {
+            boolean i = isSubStructure(A.left, B);
+            boolean j = isSubStructure(A.right, B);
+            return i || j;
+        }
+    }
+
+    /**
+     *  Offer 33. 二叉搜索树的后序遍历序列
+     */
+    public boolean verifyPostorder(int[] postorder) {
+        return verifyPost(postorder, 0, postorder.length-1);
+    }
+    private boolean verifyPost(int[] postorder, int head, int tail){
+        if ( head >= tail)
+            return true;
+        int length = postorder.length;
+        int i = head, j = tail-1;
+        while (i <= j && postorder[i] < postorder[tail])
+            i++;
+        int k = i;
+        while (i < tail){
+            if (postorder[i] > postorder[tail])
+                i++;
+            else
+                return false;
+        }
+        boolean b = verifyPost(postorder, head, k - 1);
+        boolean b1 = verifyPost(postorder, k, tail - 1);
+        return b && b1;
+    }
 
 
 
@@ -277,7 +425,10 @@ public class TreeProb {
 
 
 
-    class TreeNode{
+
+
+
+    private static class TreeNode{
         int val;
         TreeNode left;
         TreeNode right;
@@ -293,5 +444,14 @@ public class TreeProb {
     }
     public static void main(String[] args) {
         TreeProb treeProb = new TreeProb();
+        TreeNode node1 = new TreeNode(1);
+        TreeNode node2 = new TreeNode(2);
+        TreeNode node3 = new TreeNode(3);
+        TreeNode node4 = new TreeNode(4);
+        node1.left = node2;
+        node1.right = node3;
+        node2.left = node4;
+        TreeNode node5 = new TreeNode(4);
+        treeProb.isSubStructure(node1, node5);
     }
 }
