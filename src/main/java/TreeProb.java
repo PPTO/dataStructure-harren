@@ -266,7 +266,6 @@ public class TreeProb {
 
     /**
      *Offer54 二叉搜索树的第k大节点
-     * 中序遍历
      */
     private int KthRes, k;
     public int kthLargest(TreeNode root, int k) {
@@ -359,37 +358,56 @@ public class TreeProb {
     }
 
     /**
-     * Offer 68 - II. 二叉树的最近公共祖先（难！）
+     * Offer 68 - II. 二叉树的最近公共祖先 / Leecode236 二叉树的最近公共祖先
      */
-    public TreeNode lowestCommonAncestor1(TreeNode root, TreeNode p, TreeNode q) {
+    public TreeNode lowestCommonAncestor2(TreeNode root, TreeNode p, TreeNode q) {
+        //后序遍历
         if (root == null)
             return null;
-        if (root.val == p.val || root.val == q.val)
+        TreeNode n1 = null, n2 = null;
+        if (root.left != null) {
+            n1 = lowestCommonAncestor2(root.left, p, q);
+        }
+        if (root.right != null) {
+            n2 = lowestCommonAncestor2(root.right, p, q);
+        }
+        if (root.val == p.val || root.val == q.val || n1 != null && n2 != null)
             return root;
-        TreeNode left = lowestCommonAncestor1(root.left, p, q);
-        TreeNode right = lowestCommonAncestor1(root.right, p, q);
-
-
+        if (n1 != null || n2 != null){
+            return n1 != null ? n1 : n2;
+        }
         return null;
     }
 
     /**
-     * Offer 26. 树的子结构（难！）
+     * Offer 26. 树的子结构
      */
     public boolean isSubStructure(TreeNode A, TreeNode B) {
-        if (A == null && B == null)
-            return true;
         if (A == null || B == null)
             return false;
         if (A.val == B.val){
-            boolean i = isSubStructure(A.left, B.left);
-            boolean j = isSubStructure(A.right, B.right);
-            return i && j;
+            boolean b = isSubStr(A, B);
+            if (b == true)
+                return true;
+        }
+        boolean b1 = isSubStructure(A.left, B);
+        boolean b2 = isSubStructure(A.right, B);
+        return b1 || b2;
+    }
+    private boolean isSubStr(TreeNode a, TreeNode b){
+        if (b == null)
+            return true;
+        else if (a != null && b != null){
+            if (a.val != b.val) {
+                return false;
+            }
+            boolean b1 = isSubStr(a.left, b.left);
+            boolean b2 = isSubStr(a.right, b.right);
+            return b1 && b2;
         }
         else {
-            boolean i = isSubStructure(A.left, B);
-            boolean j = isSubStructure(A.right, B);
-            return i || j;
+            //其中一个不为空
+            return false;
         }
     }
 
