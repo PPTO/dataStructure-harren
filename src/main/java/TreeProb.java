@@ -1,3 +1,5 @@
+import com.sun.org.apache.bcel.internal.generic.NEW;
+
 import javax.swing.*;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -436,13 +438,58 @@ public class TreeProb {
         return b && b1;
     }
 
+    /**
+     * Offer 34. 二叉树中和为某一值的路径
+     */
+    private List<List<Integer>> lists = new ArrayList<>();
+    private List<Integer> list = new ArrayList<>();
+    public List<List<Integer>> pathSum(TreeNode root, int target) {
+        if (root == null)
+            return lists;
+        pathSummary(root, target);
+        return lists;
+    }
+    private void pathSummary(TreeNode root, int target){
+        //中序遍历：中左右
+        if (root.val == target && root.left == null && root.right == null){
+            list.add(root.val);
+            ArrayList<Integer> tmp = new ArrayList<>(list);
+            lists.add(tmp);
+            list.remove(list.size()-1);
+            return;
+        }
+        list.add(root.val);
+        if (root.left != null)
+            pathSummary(root.left, target - root.val);
+        if (root.right != null)
+            pathSummary(root.right, target - root.val);
+        // 还原
+        list.remove(list.size()-1);
+    }
 
-
-
-
-
-
-
+    /**
+     * Offer 36. 二叉搜索树与双向链表
+     */
+    ArrayList<Node> nodes = new ArrayList<>();
+    public Node treeToDoublyList(Node root) {
+        if (root == null)
+            return null;
+        treeToDouble(root);
+        for (int i = 0; i < nodes.size(); i++) {
+            Node tmp = nodes.get(i);
+            tmp.left = nodes.get((i-1+nodes.size())%nodes.size());
+            tmp.right = nodes.get((i+1)%nodes.size());
+        }
+        return nodes.get(0);
+    }
+    private void treeToDouble(Node root){
+        // 中序遍历
+        if (root == null)
+            return;
+        treeToDouble(root.left);
+        nodes.add(root);
+        treeToDouble(root.right);
+    }
 
 
 
@@ -460,6 +507,24 @@ public class TreeProb {
             this.right = right;
         }
     }
+    class Node {
+        public int val;
+        public Node left;
+        public Node right;
+
+        public Node() {}
+
+        public Node(int _val) {
+            val = _val;
+        }
+
+        public Node(int _val,Node _left,Node _right) {
+            val = _val;
+            left = _left;
+            right = _right;
+        }
+    }
+
     public static void main(String[] args) {
         TreeProb treeProb = new TreeProb();
         TreeNode node1 = new TreeNode(1);
