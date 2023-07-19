@@ -322,7 +322,6 @@ public class TreeProb {
     }
 
     /**
-     * @return root 的深度
      * 后序遍历
      */
     private int judgeBalanced(TreeNode root){
@@ -448,7 +447,7 @@ public class TreeProb {
         return lists;
     }
     private void pathSummary(TreeNode root, int target){
-        //中序遍历：中左右
+        //前序遍历：中左右
         if (root.val == target && root.left == null && root.right == null){
             list.add(root.val);
             ArrayList<Integer> tmp = new ArrayList<>(list);
