@@ -1,3 +1,7 @@
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -99,7 +103,7 @@ public class ArrayProb {
     }
 
     /**
-     * Offer 11. 旋转数组的最小数字（难!）
+     * Offer 11. 旋转数组的最小数字
      */
     public int minArray(int[] numbers) {
         // 二分查找
@@ -152,7 +156,7 @@ public class ArrayProb {
     }
 
     /**
-     * Leecode 34. 在排序数组中查找元素的第一个和最后一个位置（难！）
+     * Leecode 34. 在排序数组中查找元素的第一个和最后一个位置
      * 类型三
      * 时间复杂度为 O(log n)
      */
@@ -235,20 +239,77 @@ public class ArrayProb {
     }
 
     /**
+     * 二分法：
+     * 若 while(low < high)，则可以跟 high = mid，在 while 后根据 low 进行 return
+     * 若 while(low <= high)，则需要跟 high = mid -1，在 while 里 retuen。
+     * low 必须是 low = mid +1;
+     */
+
+    /**
+     * 对于最大值最小化、最小值最大化的问题，解题思路都为：先确定二分法的遍历范围，再二分法 + 枚举。
+     * 这类问题完全可以用一种套路解决。
+     */
+
+    /**
      * Leecode 875. 爱吃香蕉的珂珂
      * 最大化最小值问题
      */
     public int minEatingSpeed(int[] piles, int h) {
-
-
-        return -1;
+        int tail = IntStream.of(piles).max().getAsInt();
+        int head = 1;
+        while (head < tail){
+            int mid = (head + tail) / 2;
+            if (canEatAll(piles, h, mid)){
+                tail = mid;
+            }
+            else {
+                head = mid +1;
+            }
+        }
+        return head;
+    }
+    private boolean canEatAll(int[] piles, int h, int mid){
+        for (int i = 0; i < piles.length; i++) {
+            h -= piles[i] % mid == 0 ? piles[i] / mid : piles[i] / mid + 1;
+        }
+        return h < 0 ? false : true;
     }
 
 
     /**
-     * Leecode 1011. 在 D 天内送达包裹的能力（难！）
+     * Leecode 1011. 在 D 天内送达包裹的能力
      *最大化最小值
      */
+    public int shipWithinDays1(int[] weights, int days) {
+        int min = IntStream.of(weights).max().getAsInt();
+        int max = IntStream.of(weights).boxed().collect(Collectors.summingInt(Integer::intValue));
+        while (min < max){
+            int mid = (min + max) / 2;
+            if (canMinShip(weights, days, mid)){
+                max = mid;
+            }
+            else {
+                min = mid + 1;
+            }
+        }
+        return min;
+    }
+    private boolean canMinShip(int[] weights, int days, int mid){
+        int tmp = mid;
+        for (int i = 0; i < weights.length; i++) {
+            if (tmp >= weights[i]){
+                tmp -= weights[i];
+            }
+            else {
+                tmp = mid - weights[i];
+                days--;
+            }
+        }
+        days--;
+        return days >= 0 ? true: false;
+    }
+
+    //该方法的判断条件有些复杂，有些时候如果发现判断条件过多，那么就说明应该换一个方案了。
     public int shipWithinDays(int[] weights, int days) {
         int[] max = {Integer.MIN_VALUE};
         IntStream.of(weights).boxed().forEach(t1 -> max[0] = t1 > max[0] ? t1 : max[0]);
@@ -287,7 +348,65 @@ public class ArrayProb {
      * 最大值最小化问题
      */
     public int splitArray(int[] nums, int k) {
+        int max = IntStream.of(nums).boxed().collect(Collectors.summingInt(Integer::intValue));
+        int min = IntStream.of(nums).max().getAsInt();
+        while (min < max){
+            int mid = (min + max) / 2;
+            if (canSplit(nums, k, mid)){
+                max = mid;
+            }
+            else {
+                min = mid + 1;
+            }
+        }
+        return min;
+    }
+    private boolean canSplit(int[] nums, int k, int mid){
+        int tmp = mid;
+        for (int i = 0; i < nums.length; i++) {
+            if (tmp >= nums[i]){
+                tmp -= nums[i];
+            }
+            else {
+                tmp = mid - nums[i];
+                k--;
+            }
+        }
+        k--;
+        return k <0 ? false : true;
+    }
 
+    /**
+     * Offer 03. 数组中重复的数字
+     */
+    //空间复杂度 O(n)
+    public int findRepeatNumber(int[] nums) {
+        HashSet<Integer> set = new HashSet<>();
+        for (int i = 0; i < nums.length; i++) {
+            if (set.contains(nums[i])){
+                return nums[i];
+            }
+            else {
+                set.add(nums[i]);
+            }
+        }
+        return -1;
+    }
+
+    //空间复杂度 O(1)
+    public int findRepeatNumber1(int[] nums) {
+        int i = 0;
+        while (i < nums.length){
+            if (nums[i] == i)
+                i++;
+            else if (nums[nums[i]] == nums[i])
+                return nums[i];
+            else {
+                int tmp = nums[i];
+                nums[i] = nums[tmp];
+                nums[tmp] =  tmp;
+            }
+        }
         return -1;
     }
 
@@ -295,10 +414,14 @@ public class ArrayProb {
 
 
 
-
-
     public static void main(String[] args) {
         ArrayProb arrayProb = new ArrayProb();
-        arrayProb.searchRange(new int[]{5,7,7,8,8,10}, 8);
+//        arrayProb.searchRange(new int[]{5,7,7,8,8,10}, 8);
+
+        ArrayList<Integer> arrayList = new ArrayList<>();
+        List<Integer> list = Arrays.asList(1, 2, 3, 4);
+        int[] ints = {1, 2, 3, 4};
+        int[] ints1 = Arrays.copyOf(ints, ints.length);
+        System.out.println(ints.equals(ints1));
     }
 }
