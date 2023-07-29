@@ -1,9 +1,6 @@
-package java;
+package algorithm;
 
-import javax.swing.*;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class TreeProb {
 
