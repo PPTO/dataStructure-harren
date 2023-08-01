@@ -1,9 +1,6 @@
 package algorithm;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -413,6 +410,181 @@ public class ArrayProb {
     }
 
 
+    /**
+     * Offer 39. 数组中出现次数超过一半的数字 / Leecode 169. 多数元素
+     */
+    public int majorityElement(int[] nums) {
+        // 排序，中间的数为超过一版的数
+        List<Integer> collect = IntStream.of(nums).boxed().sorted().collect(Collectors.toList());
+        return  collect.get(nums.length /2);
+    }
+
+    /**
+     * Offer 39. 数组中出现次数超过一半的数字 / Leecode 169. 多数元素
+     */
+    public int majorityElement1(int[] nums) {
+        // 摩尔投票，时间复杂度：O(n)
+        int cur = -1;
+        int vot = 0;
+        for (int i = 0; i < nums.length; i++) {
+            if (vot == 0){
+                cur = nums[i];
+                vot++ ;
+            }
+            else {
+                vot = nums[i] == cur ? vot+1 : vot-1;
+            }
+        }
+        return cur;
+    }
+
+
+    /**
+     * Offer 53 - I. 在排序数组中查找数字 I
+     * 遍历的时间复杂度：0(n)
+     * 二分法时间复杂度：O(log_2 n)
+     */
+    public int search2(int[] nums, int target) {
+        //二分法找最左目标值
+        int h = 0, t = nums.length-1;
+        while (h < t){
+            int mid = (h + t) / 2;
+            if (nums[mid] == target){
+                t = mid;
+            }
+            else if (nums[mid] > target){
+                t = mid -1;
+            }
+            else if (nums[mid] < target){
+                h = mid +1;
+            }
+        }
+        int res = 0;
+        while (h < nums.length && nums[h] == target){
+            res++;
+            h++;
+        }
+        return res;
+    }
+
+    /**
+     * 当你发现一道题可以用 遍历 来解决时， 可以尝试使用 二分法 来优化时间复杂度
+     */
+
+    /**
+     * Offer 53 - II. 0～n-1中缺失的数字
+     */
+    public int missingNumber(int[] nums) {
+        // 二分法找第一个（最左）未排序的位置
+        int h = 0, t = nums.length-1;
+        while (h < t){
+            int mid = (h + t) / 2;
+            if (nums[mid] != mid){
+                t = mid;
+            }
+            else if (nums[mid] == mid){
+                h = mid + 1;
+            }
+        }
+        if (h == nums.length-1){
+            return nums[h] == h ? h+1 : h;
+        }
+        return h;
+    }
+
+    /**
+     *  Offer 57. 和为s的两个数字
+     *  时间复杂度：O(n)
+     */
+    public int[] twoSum(int[] nums, int target) {
+        // 左右两端的双指针
+        int i = 0, j = nums.length-1;
+        while (i != j){
+            if (nums[i] + nums[j] < target){
+                i++;
+            }
+            else if (nums[i] + nums[j] > target){
+                j--;
+            }
+            else {
+                break;
+            }
+        }
+        int[] res = {nums[i], nums[j]};
+        return res;
+    }
+
+    /**
+     *  Offer 57 - II. 和为s的连续正数序列
+     */
+    public int[][] findContinuousSequence(int target) {
+        //双指针，时间复杂度：o(n)
+        ArrayList<int[]> lists = new ArrayList<>();
+        int i = 1, j = 2, cur = 3, end = target/2 +1;
+        while (i != j && j <= end){
+            if (cur < target){
+                j++;
+                cur += j;
+            }
+            else if (cur > target){
+                cur -=i;
+                i++;
+            }
+            else if (cur == target){
+                int[] list = new int[j - i + 1];
+                for (int k = i; k <= j; k++) {
+                    list[k-i] = k;
+                }
+                lists.add(list);
+                cur -=i;
+                i++;
+            }
+        }
+        return lists.toArray(new int[lists.size()][]);
+    }
+
+    /**
+     * Offer 59 - I. 滑动窗口的最大值（难）
+     */
+    public int[] maxSlidingWindow(int[] nums, int k) {
+        int[] res = new int[nums.length-k+1];
+        LinkedList<Integer> list = new LinkedList<>();
+        list.addLast(nums[0]);
+        int i;
+        for (i = 1; i < k; i++) {
+            if (nums[i] >= list.get(0)){
+                list = new LinkedList<Integer>();
+                list.addLast(nums[i]);
+            }
+            else {
+                list.addLast(nums[i]);
+            }
+        }
+        int p = 0;
+        res[p++] = list.get(0);
+        for (int j = i; j < nums.length; j++) {
+            if (list.size() == k){
+                list.remove(0);
+            }
+
+            if (list.size() == 0 || nums[j] >= list.get(0)){
+                list = new LinkedList<Integer>();
+                list.addLast(nums[j]);
+            }
+            else if (nums[j] < list.get(0)){
+                list.addLast(nums[j]);
+            }
+            res[p++] = list.get(0);
+        }
+        return  res;
+    }
+
+
+
+
+
+
+
 
 
 
@@ -421,9 +593,8 @@ public class ArrayProb {
 //        arrayProb.searchRange(new int[]{5,7,7,8,8,10}, 8);
 
         ArrayList<Integer> arrayList = new ArrayList<>();
-        List<Integer> list = Arrays.asList(1, 2, 3, 4);
-        int[] ints = {1, 2, 3, 4};
-        int[] ints1 = Arrays.copyOf(ints, ints.length);
-        System.out.println(ints.equals(ints1));
+        List<Integer> list = Arrays.asList(5,7,7,8,8,10);
+        int[] ints = {1,3,-1,-3,5,3,6,7};
+        arrayProb.maxSlidingWindow(ints, 3);
     }
 }
