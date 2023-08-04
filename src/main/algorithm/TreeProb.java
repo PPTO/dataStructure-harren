@@ -487,6 +487,26 @@ public class TreeProb {
         treeToDouble(root.right);
     }
 
+    /**
+     * Leecode 111. 二叉树的最小深度
+     */
+    public int minDepth(TreeNode root) {
+        if (root == null)
+            return 0;
+        int i = minDepth(root.left);
+        int j = minDepth(root.right);
+        if (i == 0 || j == 0)
+            return j == 0 ? i + 1 : j + 1;
+        else {
+            return i > j ? j + 1 : i + 1;
+        }
+    }
+
+
+    
+
+
+
 
 
     private static class TreeNode{
@@ -520,6 +540,10 @@ public class TreeProb {
             right = _right;
         }
     }
+
+
+
+
 
     public static void main(String[] args) {
         TreeProb treeProb = new TreeProb();

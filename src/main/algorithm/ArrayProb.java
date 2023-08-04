@@ -1,8 +1,11 @@
 package algorithm;
 
+import com.sun.org.apache.bcel.internal.generic.NEW;
+
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 /**
  * 数组问题包括：
@@ -547,38 +550,294 @@ public class ArrayProb {
      * Offer 59 - I. 滑动窗口的最大值（难）
      */
     public int[] maxSlidingWindow(int[] nums, int k) {
-        int[] res = new int[nums.length-k+1];
-        LinkedList<Integer> list = new LinkedList<>();
-        list.addLast(nums[0]);
-        int i;
-        for (i = 1; i < k; i++) {
-            if (nums[i] >= list.get(0)){
-                list = new LinkedList<Integer>();
-                list.addLast(nums[i]);
+        ArrayList<Integer> res = new ArrayList<>();
+        LinkedList<Integer> queue = new LinkedList<>();
+        for (int i = 0; i < k; i++) {
+            while (!queue.isEmpty() && nums[i] > queue.peekLast()){
+                queue.removeLast();
             }
-            else {
-                list.addLast(nums[i]);
-            }
+            queue.addLast(nums[i]);
         }
-        int p = 0;
-        res[p++] = list.get(0);
-        for (int j = i; j < nums.length; j++) {
-            if (list.size() == k){
-                list.remove(0);
+        res.add(queue.get(0));
+        for (int i = k; i < nums.length; i++) {
+            //1. 先把前一个数删去
+            if (!queue.isEmpty() && nums[i-k] == queue.peekFirst()){
+                queue.removeFirst();
             }
-
-            if (list.size() == 0 || nums[j] >= list.get(0)){
-                list = new LinkedList<Integer>();
-                list.addLast(nums[j]);
+            //2. 再去添加新的数
+            while (!queue.isEmpty() && nums[i] > queue.peekLast()){
+                queue.removeLast();
             }
-            else if (nums[j] < list.get(0)){
-                list.addLast(nums[j]);
-            }
-            res[p++] = list.get(0);
+            queue.addLast(nums[i]);
+            res.add(queue.get(0));
         }
-        return  res;
+        return res.stream().mapToInt(Integer::intValue).toArray();
     }
 
+    /**
+     * Offer 59 - II. 队列的最大值
+     */
+    class MaxQueue {
+
+        ArrayList<Integer> list;
+        //储存最大值
+        LinkedList<Integer> queue;
+
+        public MaxQueue() {
+            list = new ArrayList<>();
+            queue = new LinkedList<>();
+        }
+
+        public int max_value() {
+            return queue.isEmpty() ? -1 : queue.peekFirst();
+        }
+
+        public void push_back(int value) {
+            list.add(value);
+            while (!queue.isEmpty() && queue.peekLast() < value){
+                queue.removeLast();
+            }
+            queue.addLast(value);
+        }
+
+        public int pop_front() {
+            if (list.isEmpty())
+                return -1;
+            /**
+             * bug: integer 类型判断相等要用 equal ，不能用 “==”
+             */
+            int r = list.remove(0);
+            if (r == queue.peekFirst()){
+                queue.removeFirst();
+            }
+            return r;
+        }
+    }
+
+    /**
+     * Offer 61. 扑克牌中的顺子
+     * 或者用： set数组判断数字的唯一性
+     */
+    public boolean isStraight(int[] nums) {
+        //除0最大值
+        int max = IntStream.of(nums).filter((t) -> !Objects.equals(t, 0)).max().getAsInt();
+        //除0最小值
+        int min = IntStream.of(nums).filter((t) -> !Objects.equals(t, 0)).min().getAsInt();
+
+        long count1 = IntStream.of(nums).filter((t) -> !Objects.equals(t, 0)).distinct().count();
+
+        long count2 = IntStream.of(nums).filter((t) -> !Objects.equals(t, 0)).count();
+
+        return max - min < 5 && count2 == count1 ;
+    }
+
+    /**
+     * Offer 31. 栈的压入、弹出序列
+     */
+    public boolean validateStackSequences(int[] pushed, int[] popped) {
+        int i = 0;
+        Stack<Integer> stack = new Stack<>();
+        for (int j = 0; j < pushed.length; j++) {
+            stack.add(pushed[j]);
+            while (!stack.isEmpty() && i < popped.length && popped[i] == stack.peek()){
+                i++;
+                stack.pop();
+            }
+        }
+        return stack.isEmpty() ? true : false;
+    }
+
+    /**
+     * Offer 51. 数组中的逆序对
+     */
+    public int reversePairs(int[] nums) {
+        // 归并排序
+        return mergeSort(nums, 0, nums.length-1);
+    }
+
+    /**
+     * 排序
+     * @return 逆序对数
+     */
+    private int mergeSort(int[] nums, int h, int t){
+        if (h >= t)
+            return 0;
+        int mid = (h + t)/2;
+        int num = 0;
+        int i = mergeSort(nums, h, mid);
+        int j = mergeSort(nums, mid + 1, t);
+        //优化! 不优化有一个示例会超时！
+        if (nums[mid] <= nums[mid + 1])
+            return i + j;
+        int[] array = new int[nums.length];
+        int m = h, n = mid + 1, o = h;
+        while (m <= mid && n <= t){
+            if (nums[n] < nums[m]){
+                num += mid - m + 1;
+                array[o++] = nums[n++];
+            }
+            else {
+                array[o++] = nums[m++];
+            }
+        }
+        while (m <= mid){
+            array[o++] = nums[m++];
+        }
+        while (n <= t){
+            array[o++] = nums[n++];
+        }
+        for (int k = h; k <=t; k++) {
+            nums[k] = array[k];
+        }
+        return i + j + num;
+    }
+
+    /**
+     * Leecode 31. 下一个排列
+     */
+    public void nextPermutation(int[] nums) {
+        int i ;
+        for (i = nums.length-1; i >0; i--) {
+            if (nums[i] > nums[i-1]){
+                for (int j = nums.length-1; j >=i; j--) {
+                    if (nums[j] > nums[i-1]){
+                        int tmp = nums[j];
+                        nums[j] = nums[i-1];
+                        nums[i-1] = tmp;
+                        break;
+                    }
+                }
+                break;
+            }
+        }
+        Arrays.sort(nums, i, nums.length);
+    }
+
+    /**
+     * Leecode 752. 打开转盘锁
+     */
+    public int openLock(String[] deadends, String target) {
+        // 必须用 bfs，不能用 dfs!!
+        String cur = "0000";
+        if (target.equals(cur))
+            return 0;
+//        List<String> dns_tmp = Arrays.asList(deadends);
+//        ArrayList<String> dns = new ArrayList<>(dns_tmp);
+        Set<String> dns = Stream.of(deadends).collect(Collectors.toSet());
+        if (dns.contains(cur))
+            return -1;
+        dns.add(cur);
+        ArrayList<String> queue = new ArrayList<>();
+        queue.add(cur);
+        int step = 0;
+        while (!queue.isEmpty()){
+            step++;
+            /**
+             * 巨错！
+             * for (int i = 0; i < queue.size(); i++)
+             */
+            int size = queue.size();
+            for (int i = 0; i < size; i++) {
+                String s = queue.remove(0);
+                for (int j = 0; j < 4; j++) {
+                    String up = up(s, j);
+                    if (up.equals(target)) {
+                        return step;
+                    }
+                    if (!dns.contains(up)) {
+                        dns.add(up);
+                        queue.add(up);
+                    }
+                }
+                for (int j = 0; j < 4; j++) {
+                    String down = down(s, j);
+                    if (down.equals(target)){
+                        return step;
+                    }
+                    if (!dns.contains(down)){
+                        dns.add(down);
+                        queue.add(down);
+                    }
+                }
+            }
+        }
+        return -1;
+    }
+
+    private String up(String s, int i){
+        char[] chars = s.toCharArray();
+        if (chars[i] == '9'){
+            chars[i] = '0';
+        }
+        else {
+            chars[i] +=1;
+        }
+        return String.valueOf(chars);
+    }
+    private String down(String s, int i){
+        char[] chars = s.toCharArray();
+        if (chars[i] == '0')
+            chars[i] = '9';
+        else
+            chars[i] -= 1;
+        return String.valueOf(chars);
+    }
+
+
+
+    /**
+     * dfs 要搭配 回溯
+     */
+
+    /**
+     * Leecode 46. 全排列
+     */
+    public List<List<Integer>> permute(int[] nums) {
+        // 经典 dfs
+        List<List<Integer>> lists = new ArrayList<>();
+        HashSet<Integer> set = new HashSet<>();
+        List<Integer> list = new ArrayList<>();
+        per(nums, lists, list, set);
+        return lists;
+    }
+    private void per(int[] nums, List<List<Integer>> lists, List<Integer> list, HashSet<Integer> set){
+        if (list.size() == nums.length){
+            lists.add(new ArrayList<Integer>(list));
+            return;
+        }
+        for (int i = 0; i < nums.length; i++) {
+            int tmp = nums[i];
+            if (!set.contains(tmp)){
+                set.add(tmp);
+                list.add(tmp);
+                // 递归
+                per(nums,lists,list,set);
+                //回溯
+                set.remove(tmp);
+                list.remove(list.size()-1);
+            }
+        }
+    }
+
+    /**
+     * Leecode 78. 子集
+     */
+    public List<List<Integer>> subsets(int[] nums) {
+        List<Integer> list = new ArrayList<>();
+        List<List<Integer>> lists = new ArrayList<>();
+        subset(nums,list,lists,0);
+        return lists;
+    }
+    private void subset(int[] nums, List<Integer> list, List<List<Integer>> lists,int j){
+        lists.add(new ArrayList<>(list));
+        for (int i = j; i < nums.length; i++) {
+            int num = nums[i];
+            list.add(num);
+            subset(nums, list, lists,i+1);
+            //回溯
+            list.remove(list.size()-1);
+        }
+    }
 
 
 
@@ -596,5 +855,22 @@ public class ArrayProb {
         List<Integer> list = Arrays.asList(5,7,7,8,8,10);
         int[] ints = {1,3,-1,-3,5,3,6,7};
         arrayProb.maxSlidingWindow(ints, 3);
+
+        int[] ints1 = {1,2,3,4,5};
+        arrayProb.isStraight(ints1);
+
+        int[] ints2 = {7,5,6,4};
+        arrayProb.reversePairs(ints2);
+
+        int[] ints4 = {1,3,2};
+        arrayProb.nextPermutation(ints4);
+
+        String[] strings = {"0201","0101","0102","1212","2002"};
+        int i = arrayProb.openLock(strings, "0202");
+
+        int[] ints3 = {1,2,3};
+        arrayProb.subsets(ints3);
+
+
     }
 }
