@@ -839,6 +839,167 @@ public class ArrayProb {
         }
     }
 
+    /**
+     * Leecode 77. 组合
+     */
+    public List<List<Integer>> combine(int n, int k) {
+        List<List<Integer>> lists = new ArrayList<>();
+        List<Integer> list = new ArrayList<>();
+        com(lists, list, n, k);
+        return lists;
+    }
+
+    private void com(List<List<Integer>> lists, List<Integer> list, int n, int k){
+        if (k == 0){
+            lists.add(new ArrayList<>(list));
+            return;
+        }
+        for (int i = n; i >0; i--) {
+            list.add(i);
+            com(lists, list, i-1, k-1);
+            list.remove(list.size()-1);
+        }
+    }
+
+    /**
+     * Leecode 22. 括号生成 （难！）
+     */
+    public List<String> generateParenthesis(int n) {
+        // 问题转换成：现在有 2n 个位置，每个号组合中，有多少个是合法的？
+        ArrayList<String> list = new ArrayList<>();
+        String s = "";
+        gp(n, n, list, s);
+        return list;
+    }
+
+    /**
+     * @param n 当前 ‘（’ 的数量
+     * @param m 当前 ‘）’ 的数量
+     */
+    private void gp(int n, int m, List<String> list, String s){
+        if (n == 0 && m == 0 && !list.contains(s)){
+            list.add(s);
+            return;
+        }
+        if (n < 0 || m < 0){
+            return;
+        }
+        if ( m >= n ){
+            s += "(";
+            gp(n-1, m, list, s);
+            // 回溯
+            s = s.substring(0, s.length() - 1);
+            s += ")";
+            gp(n, m-1, list, s);
+            // 回溯
+            s = s.substring(0, s.length()-1);
+        }
+    }
+
+    /**
+     * Leecode 200. 岛屿数量
+     */
+    public int numIslands(char[][] grid) {
+        int[] X = {1, 0, -1, 0};
+        int[] Y = {0, 1, 0, -1};
+        int res = 0;
+        for (int i = 0; i < grid.length; i++) {
+            for (int j = 0; j < grid[0].length; j++) {
+                if (grid[i][j] == '1'){
+                    numIs(grid, X, Y, i, j);
+                    res ++;
+                }
+
+            }
+        }
+        return res;
+    }
+    private void numIs(char[][] grid, int[] X, int[] Y, int x, int y){
+        //遍历所有连接的岛屿并将1 变为0
+        if (grid[x][y] == '0')
+            return;
+        grid[x][y] = '0';
+        for (int i = 0; i < 4; i++) {
+            if (X[i] + x >=0 && X[i] + x < grid.length && Y[i] + y >=0 && Y[i] + y < grid[0].length)
+                numIs(grid, X, Y, X[i]+x, Y[i]+y);
+        }
+    }
+
+
+    /**
+     * Leecode 463. 岛屿的周长
+     */
+    public int islandPerimeter(int[][] grid) {
+        int[] X = {1, -1, 0, 0};
+        int[] Y = {0, 0, 1, -1};
+        int perimeter = 0;
+        for (int i = 0; i < grid.length; i++) {
+            for (int j = 0; j < grid[0].length; j++) {
+                if (grid[i][j] == 1){
+                    for (int k = 0; k < 4; k++) {
+                        if (X[k] + i < 0 || X[k] + i >= grid.length || Y[k] + j < 0 || Y[k] + j >= grid[0].length){
+                            perimeter++;
+                        }
+                        else if (grid[X[k]+i][Y[k]+j] == 0){
+                            perimeter++;
+                        }
+                    }
+                }
+            }
+        }
+        return perimeter;
+    }
+
+    /**
+     * 使用递归记得用 返回值 记录结果
+     */
+
+    /**
+     * Leecode 695. 岛屿的最大面积
+     */
+    public int maxAreaOfIsland(int[][] grid) {
+        int[] X = {1, -1, 0, 0};
+        int[] Y = {0, 0, 1, -1};
+        int max = Integer.MIN_VALUE;
+        for (int i = 0; i < grid.length; i++) {
+            for (int j = 0; j < grid[0].length; j++) {
+                if (grid[i][j] == 1){
+                    int tmp = mai(grid, X, Y, i, j);
+                    max = max >= tmp ? max : tmp;
+                }
+
+            }
+        }
+        return max == Integer.MIN_VALUE ? 0 : max;
+    }
+    private int mai(int[][] grid, int[] X, int[] Y, int x, int y){
+        if (grid[x][y] == 0){
+            return 0;
+        }
+        int area = 0;
+        if (grid[x][y] == 1){
+            area++;
+            grid[x][y] = 0;
+        }
+        for (int i = 0; i < 4; i++) {
+            int x_new = X[i] + x;
+            int y_new = Y[i] + y;
+            if (x_new >=0 && x_new <grid.length && y_new >= 0 && y_new < grid[0].length){
+                area += mai(grid,X, Y, x_new, y_new);
+            }
+        }
+        return area;
+    }
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -849,28 +1010,13 @@ public class ArrayProb {
 
     public static void main(String[] args) {
         ArrayProb arrayProb = new ArrayProb();
-//        arrayProb.searchRange(new int[]{5,7,7,8,8,10}, 8);
 
-        ArrayList<Integer> arrayList = new ArrayList<>();
-        List<Integer> list = Arrays.asList(5,7,7,8,8,10);
-        int[] ints = {1,3,-1,-3,5,3,6,7};
-        arrayProb.maxSlidingWindow(ints, 3);
+        int[][] x = {{1,1}};
+        int i1 = arrayProb.islandPerimeter(x);
+        System.out.println(i1);
 
-        int[] ints1 = {1,2,3,4,5};
-        arrayProb.isStraight(ints1);
-
-        int[] ints2 = {7,5,6,4};
-        arrayProb.reversePairs(ints2);
-
-        int[] ints4 = {1,3,2};
-        arrayProb.nextPermutation(ints4);
-
-        String[] strings = {"0201","0101","0102","1212","2002"};
-        int i = arrayProb.openLock(strings, "0202");
-
-        int[] ints3 = {1,2,3};
-        arrayProb.subsets(ints3);
-
+        int[][] area = {{0,0,1,0,0,0,0,1,0,0,0,0,0},{0,0,0,0,0,0,0,1,1,1,0,0,0},{0,1,1,0,1,0,0,0,0,0,0,0,0},{0,1,0,0,1,1,0,0,1,0,1,0,0},{0,1,0,0,1,1,0,0,1,1,1,0,0},{0,0,0,0,0,0,0,0,0,0,1,0,0},{0,0,0,0,0,0,0,1,1,1,0,0,0},{0,0,0,0,0,0,0,1,1,0,0,0,0}};
+        arrayProb.maxAreaOfIsland(area);
 
     }
 }
