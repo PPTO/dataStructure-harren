@@ -210,22 +210,39 @@ public class StringProb {
          * 核心思想：从中间开始向两边扩散来判断回文串
          * 注意要同时考虑回文串长度是奇数和偶数两种情况
          */
+        String res = "";
+        for (int i = 0; i < s.length(); i++) {
+            //奇数情况
+            String s1 = palindrome(s, i, i);
+            //偶数情况
+            String s2 = palindrome(s, i, i + 1);
+            res = res.length() >s1.length() ? res : s1;
+            res = res.length() >s2.length() ? res : s2;
+        }
+        return res;
+    }
+    public String palindrome (String s, int l, int r){
+        while (l>=0 && r<s.length() && s.charAt(l) == s.charAt(r)){
+            l--;
+            r++;
+        }
 
+        return s.substring(l+1, r);
+    }
 
+    /**
+     * Leecode 93. 复原 IP 地址（难！）
+     */
+    public List<String> restoreIpAddresses(String s) {
+        // dfs
 
         return null;
     }
 
-
-
-
-
-
-
-
-
     public static void main(String[] args) {
         StringProb sp = new StringProb();
         sp.addStrings("11", "123");
+        String string = "123.12.33.";
+        sp.restoreIpAddresses("25525511135");
     }
 }
