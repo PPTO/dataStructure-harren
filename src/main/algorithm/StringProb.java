@@ -201,7 +201,7 @@ public class StringProb {
     }
 
     /**
-     * Leecode 5 最长回文子串（难！）
+     * Leecode 5 最长回文子串
      * 区别于最长回文子序列
      */
     public String longestPalindrome(String s) {
@@ -235,14 +235,51 @@ public class StringProb {
      */
     public List<String> restoreIpAddresses(String s) {
         // dfs
-
-        return null;
+        ArrayList<String> list = new ArrayList<>();
+        ArrayList<String> cur = new ArrayList<>();
+        ria(s, 0, list, cur);
+        return list;
     }
+
+    private void ria(String s, int start, List<String> list, List<String> cur){
+        if (start == s.length() && cur.size() == 4){
+            String tmp = "";
+            for (int i = 0; i < 4; i++) {
+                tmp += cur.get(i) + (i==3 ? "" : ".");
+            }
+            list.add(tmp);
+        }
+
+        if (start < s.length() && cur.size() < 4){
+            String tmp = "";
+            for (int i = 0; i < 3; i++) {
+                if (start + i == s.length())
+                    return;
+                char c = s.charAt(start + i);
+                tmp += c;
+                if (Integer.parseInt(tmp) > 255){
+                    return;
+                }
+                cur.add(tmp);
+                ria(s, start+i+1, list, cur);
+                // 回溯
+                cur.remove(cur.size()-1);
+                if (tmp.equals("0")){
+                    return;
+                }
+            }
+        }
+    }
+
+
+
+
+
 
     public static void main(String[] args) {
         StringProb sp = new StringProb();
         sp.addStrings("11", "123");
         String string = "123.12.33.";
-        sp.restoreIpAddresses("25525511135");
+        sp.restoreIpAddresses("101023");
     }
 }
