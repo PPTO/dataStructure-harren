@@ -1,4 +1,6 @@
-package algorithm.designPattern;
+package algorithm;
+
+import java.util.stream.IntStream;
 
 public class dpProb {
 
@@ -93,20 +95,6 @@ public class dpProb {
             num += tmp >0 ? tmp : 0;
         }
         return num;
-    }
-
-    /**
-     * Offer 42. 连续子数组的最大和
-     */
-    public int maxSubArray(int[] nums) {
-        int[] dp = new int[nums.length];
-        dp[0] = nums[0];
-        int max = Integer.MIN_VALUE;
-        for (int i = 1; i < nums.length; i++) {
-            dp[i] = Math.max(dp[i-1] + nums[i], nums[i]);
-            max = max >= dp[i] ? max : dp[i];
-        }
-        return max;
     }
 
     /**
@@ -226,9 +214,154 @@ public class dpProb {
     }
 
     /**
-     * Leecode 322. 零钱兑换
+     * Leecode 322. 零钱兑换（难！初始值的设置）
      */
     public int coinChange(int[] coins, int amount) {
+        int[][] dp = new int[coins.length + 1][amount + 1];
+        //1. 初始化：第一列, 第一行都为 0
+        for (int i = 0; i < dp[0].length; i++) {
+            dp[0][i] = amount+1;
+        }
+        for (int i = 0; i < dp.length; i++) {
+            dp[i][0] = 0;
+        }
+        for (int i = 1; i < dp.length; i++) {
+            for (int j = 1; j < dp[0].length; j++) {
+                int coin = coins[i-1];
+                if (coin > j){
+                    dp[i][j] = dp[i-1][j];
+                }
+                if (coin <= j){
+                    dp[i][j] = Math.min(dp[i-1][j] , 1 + dp[i][j-coin]);
+                }
+            }
+        }
+        return dp[dp.length-1][dp[0].length-1] == amount+1
+                ? -1
+                : dp[dp.length-1][dp[0].length-1];
+    }
+
+    /**
+     * 0-1 背包问题就是 背包里的物品只有一个
+     * 完全背包问题就是 背包里的物品数量无限
+     * 区别就在于：
+     *  dp[i][j] = dp[i-1][j] + dp[i][j-coin];  完全背包
+     *  dp[i][j] = dp[i-1][j] + dp[i-1][j-coin]; 0-1背包
+     */
+
+    /**
+     * Leecode 518 零钱兑换 II（完全背包问题）
+     */
+    public int change(int amount, int[] coins) {
+        int[][] dp = new int[coins.length + 1][amount + 1];
+        for (int i = 0; i < dp.length; i++) {
+            dp[i][0] = 1;
+        }
+        for (int i = 1; i < dp.length; i++) {
+            for (int j = 1; j < dp[0].length; j++) {
+                int coin = coins[i - 1];
+                if (coin > j){
+                    dp[i][j] = dp[i-1][j];
+                }
+                else {
+                    dp[i][j] = dp[i-1][j] + dp[i][j-coin];
+                }
+            }
+        }
+        return dp[dp.length-1][dp[0].length-1];
+    }
+
+    /**
+     * Leecode 416. 分割等和子集（难！）
+     */
+    public boolean canPartition(int[] nums) {
+        /**
+         * 本题是一个 NP 问题，因此不能使用双指针（贪心）解决该问题。
+         * 应聚焦于如何将该问题转换成背包问题
+         */
+        int sum = IntStream.of(nums).sum();
+        if (sum % 2 != 0 || nums.length == 1)
+            return false;
+        int half = sum / 2;
+        boolean[][] dp = new boolean[nums.length + 1][half + 1];
+        //1. 初始化
+        for (int i = 0; i < dp.length; i++) {
+            dp[i][0] =true;
+        }
+        for (int i = 1; i < dp.length; i++) {
+            for (int j = 1; j < dp[0].length; j++) {
+                int num = nums[i-1];
+                if (num > j)
+                    dp[i][j] = dp[i-1][j];
+                else {
+                    dp[i][j] = dp[i-1][j] || dp[i-1][j-num];
+                }
+            }
+        }
+        return dp[dp.length-1][dp[0].length-1];
+    }
+
+    /**
+     * Offer 42. 连续子数组的最大和 / Leecode 53. 最大子数组和 / 最大子序和/
+     */
+    public int maxSubArray(int[] nums) {
+        // 这道题还不能用滑动窗口算法，因为数组中的数字可以是负数。
+        int[] dp = new int[nums.length];
+        dp[0] = nums[0];
+        for (int i = 1; i < nums.length; i++) {
+            dp[i] = Math.max(dp[i-1] + nums[i], nums[i]);
+        }
+        int max = Integer.MIN_VALUE;
+        for (int i = 0; i < nums.length; i++) {
+            max = max >= dp[i] ? max : dp[i];
+        }
+        return max;
+    }
+
+    /**
+     * Leecode 300. 最长递增子序列
+     */
+    public int lengthOfLIS(int[] nums) {
+        // dp[i] 表示以 nums[i] 这个数结尾的最长递增子序列的长度。
+        int[] dp = new int[nums.length];
+        dp[0] = 1;
+        int res = 1;
+        for (int i = 1; i < dp.length; i++) {
+            int max = 1;
+            for (int j = 0; j < i; j++) {
+                if (nums[j] < nums[i]){
+                    max = Math.max(max, dp[j] + 1);
+                }
+            }
+            dp[i] = max;
+            res = res > max ? res : max;
+        }
+        return res;
+    }
+
+
+    /**
+     * Leecode 1143. 最长公共子序列
+     */
+    public int longestCommonSubsequence(String text1, String text2) {
+        int[][] dp = new int[text1.length() + 1][text2.length() + 1];
+        for (int i = 1; i < dp.length; i++) {
+            for (int j = 1; j < dp[0].length; j++) {
+                if (text1.charAt(i-1) == text2.charAt(j-1))
+                    dp[i][j] = dp[i-1][j-1] + 1;
+                else
+                    dp[i][j] = Math.max(dp[i-1][j], dp[i][j-1]);
+            }
+        }
+        return dp[dp.length-1][dp[0].length-1];
+    }
+
+
+    /**
+     * Leecode 516. 最长回文子序列（难！）
+     */
+    public int longestPalindromeSubseq(String s) {
+        //  dp 数组的含义：在子串s[i..j]中，最长回文子序列的长度为dp[i][j]
 
         return -1;
     }
@@ -236,13 +369,11 @@ public class dpProb {
 
 
 
-
-
-
     public static void main(String[] args) {
         dpProb dpProb = new dpProb();
-        dpProb.dicesProbability(2);
-        dpProb.cuttingRope(4);
+        int[] ints = {1, 2, 5};
+        boolean b = dpProb.canPartition(ints);
+        dpProb.longestCommonSubsequence("bsbininm", "jmjkbkjkv");
 
     }
 }
