@@ -1,5 +1,7 @@
 package algorithm;
 
+import com.sun.org.apache.bcel.internal.generic.NEW;
+
 import java.util.*;
 
 public class TreeProb {
@@ -502,9 +504,74 @@ public class TreeProb {
         }
     }
 
+    /**
+     * Offer 37. 序列化二叉树（难！）
+     */
+    public String serialize(TreeNode root) {
+        if (root == null)
+            return "[]";
+        ArrayList<String> list = new ArrayList<>();
+        // 层序遍历
+        LinkedList<TreeNode> queue = new LinkedList<>();
+        queue.addLast(root);
 
-    
+        while (!queue.isEmpty()){
+            boolean flag = false;
+            int size = queue.size();
+            for (int i = 0; i < size; i++) {
+                TreeNode node = queue.removeFirst();
+                if (node != null){
+                    list.add(String.valueOf(node.val));
+                    queue.add(node.left);
+                    queue.add(node.right);
+                    flag = true;
+                }
+                else {
+                    list.add("null");
+                    queue.add(null);
+                    queue.add(null);
+                }
+            }
+            if (flag == false)
+                break;
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        for (int i = 0; i < list.size(); i++) {
+            sb.append(
+                    list.get(i) + (i == list.size()-1 ? "" : ",")
+            );
+        }
+        sb.append("]");
+        return sb.toString();
+    }
 
+    public TreeNode deserialize(String data) {
+        if (data.equals("[]"))
+            return null;
+        String[] split = data.substring(1, data.length() - 1).split(",");
+        List<String> list = new ArrayList<>(Arrays.asList(""));
+        for (String s : split) {
+            list.add(s);
+        }
+        TreeNode[] nodes = new TreeNode[list.size()];
+        nodes[1] = new TreeNode(Integer.parseInt(list.get(1)));
+        for (int i = 2; i < list.size(); i++) {
+            String string = list.get(i);
+            if (!string.equals("null")){
+                TreeNode node = new TreeNode(Integer.parseInt(string));
+                nodes[i] = node;
+                if (i %2 == 0){
+                    // left
+                    nodes[i/2].left = node;
+                }
+                else {
+                    nodes[i/2].right = node;
+                }
+            }
+        }
+        return nodes[1];
+    }
 
 
 
@@ -540,10 +607,6 @@ public class TreeProb {
             right = _right;
         }
     }
-
-
-
-
 
     public static void main(String[] args) {
         TreeProb treeProb = new TreeProb();

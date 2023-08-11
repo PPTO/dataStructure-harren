@@ -339,7 +339,6 @@ public class dpProb {
         return res;
     }
 
-
     /**
      * Leecode 1143. 最长公共子序列
      */
@@ -356,15 +355,33 @@ public class dpProb {
         return dp[dp.length-1][dp[0].length-1];
     }
 
-
     /**
      * Leecode 516. 最长回文子序列（难！）
      */
     public int longestPalindromeSubseq(String s) {
         //  dp 数组的含义：在子串s[i..j]中，最长回文子序列的长度为dp[i][j]
-
-        return -1;
+        int[][] dp = new int[s.length()][s.length()];
+        for (int i = 0; i < dp.length; i++) {
+            dp[i][i] = 1;
+        }
+        for (int i = dp.length-1; i >= 0 ; i--) {
+            for (int j = i+1; j < dp.length; j++) {
+                if (s.charAt(i) == s.charAt(j))
+                    dp[i][j] = dp[i+1][j-1] + 2;
+                else {
+                    dp[i][j] = Math.max(dp[i+1][j], dp[i][j-1]);
+                }
+            }
+        }
+        return dp[0][dp.length-1];
     }
+
+
+
+
+
+
+
 
 
 
@@ -373,7 +390,7 @@ public class dpProb {
         dpProb dpProb = new dpProb();
         int[] ints = {1, 2, 5};
         boolean b = dpProb.canPartition(ints);
-        dpProb.longestCommonSubsequence("bsbininm", "jmjkbkjkv");
+        dpProb.longestPalindromeSubseq("bbbab");
 
     }
 }
