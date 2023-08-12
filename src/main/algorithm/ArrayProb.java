@@ -22,6 +22,7 @@ public class ArrayProb {
      * Offer 21. 调整数组顺序使奇数位于偶数前面
      */
     public int[] exchange(int[] nums) {
+        // 单次快排
         if (nums == null || nums.length == 0)
             return nums;
         int head = 0, tail = nums.length -1;
@@ -59,6 +60,7 @@ public class ArrayProb {
      * Offer 45. 把数组排成最小的数（难！最骚的题）
      */
     public String minNumber(int[] nums) {
+        // 排序题
         quickSort(nums, 0, nums.length-1);
         String s = "";
         for (int num : nums) {
@@ -94,7 +96,7 @@ public class ArrayProb {
     }
 
     /**
-     * 215. 数组中的第K个最大元素
+     * Leecode 215. 数组中的第K个最大元素
      * 要求：时间复杂度为 O(n)
      */
     public int findKthLargest(int[] nums, int k) {
@@ -243,7 +245,7 @@ public class ArrayProb {
     /**
      * 二分法：
      * 若 while(low < high)，则可以跟 high = mid，在 while 后根据 low 进行 return
-     * 若 while(low <= high)，则需要跟 high = mid -1，在 while 里 retuen。
+     * 若 while(low <= high)，则需要跟 high = mid -1，（或）在 while 里 return。
      * low 必须是 low = mid +1;
      */
 
