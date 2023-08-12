@@ -508,70 +508,141 @@ public class TreeProb {
      * Offer 37. 序列化二叉树（难！）
      */
     public String serialize(TreeNode root) {
+        // 层序遍历、思路：怎么序列回来的，怎么序列回去
         if (root == null)
             return "[]";
-        ArrayList<String> list = new ArrayList<>();
-        // 层序遍历
         LinkedList<TreeNode> queue = new LinkedList<>();
-        queue.addLast(root);
-
+        queue.add(root);
+        String s = "[";
         while (!queue.isEmpty()){
-            boolean flag = false;
-            int size = queue.size();
-            for (int i = 0; i < size; i++) {
-                TreeNode node = queue.removeFirst();
-                if (node != null){
-                    list.add(String.valueOf(node.val));
-                    queue.add(node.left);
-                    queue.add(node.right);
-                    flag = true;
-                }
-                else {
-                    list.add("null");
-                    queue.add(null);
-                    queue.add(null);
-                }
+            TreeNode node = queue.removeFirst();
+            if (node == null){
+                s += "null,";
             }
-            if (flag == false)
-                break;
+            else {
+                queue.add(
+                        node.left != null ? node.left : null
+                );
+                queue.add(
+                        node.right != null ? node.right : null
+                );
+                s += (node.val + ",");
+            }
         }
-        StringBuilder sb = new StringBuilder();
-        sb.append("[");
-        for (int i = 0; i < list.size(); i++) {
-            sb.append(
-                    list.get(i) + (i == list.size()-1 ? "" : ",")
-            );
-        }
-        sb.append("]");
-        return sb.toString();
+        return s.substring(0, s.length()-1) + "]";
     }
 
     public TreeNode deserialize(String data) {
         if (data.equals("[]"))
             return null;
-        String[] split = data.substring(1, data.length() - 1).split(",");
-        List<String> list = new ArrayList<>(Arrays.asList(""));
-        for (String s : split) {
-            list.add(s);
+        LinkedList<TreeNode> queue = new LinkedList<>();
+        String[] strings = data.substring(1, data.length() - 1).split(",");
+        TreeNode root = new TreeNode(Integer.parseInt(strings[0]));
+        queue.add(root);
+        int p = 1;
+        while (!queue.isEmpty()){
+            TreeNode node = queue.removeFirst();
+            TreeNode left = null;
+            if (!strings[p].equals("null")) {
+                left = new TreeNode(Integer.parseInt(strings[p]));
+                queue.add(left);
+            }
+            node.left = left;
+            p++;
+            TreeNode right = null;
+            if (!strings[p].equals("null")) {
+                right = new TreeNode(Integer.parseInt(strings[p]));
+                queue.add(right);
+            }
+            node.right = right;
+            p++;
         }
-        TreeNode[] nodes = new TreeNode[list.size()];
-        nodes[1] = new TreeNode(Integer.parseInt(list.get(1)));
-        for (int i = 2; i < list.size(); i++) {
-            String string = list.get(i);
-            if (!string.equals("null")){
-                TreeNode node = new TreeNode(Integer.parseInt(string));
-                nodes[i] = node;
-                if (i %2 == 0){
-                    // left
-                    nodes[i/2].left = node;
-                }
-                else {
-                    nodes[i/2].right = node;
+        return root;
+    }
+
+    /**
+     * Leecode 226. 翻转二叉树
+     */
+    public TreeNode invertTree(TreeNode root) {
+        if (root == null)
+            return null;
+        TreeNode left = root.left;
+        TreeNode right = root.right;
+        root.left = invertTree(right);
+        root.right = invertTree(left);
+        return root;
+    }
+
+    /**
+     * Leecode 114. 二叉树展开为链表
+     */
+    public void flatten(TreeNode root) {
+        if (root == null)
+            return;
+        ArrayList<TreeNode> list = new ArrayList<>();
+        po(root, list);
+        for (int i = 0; i < list.size(); i++) {
+            TreeNode node = list.get(i);
+            node.left = null;
+            if (i != list.size()-1)
+                node.right = list.get(i+1);
+        }
+    }
+    private void po(TreeNode root, ArrayList<TreeNode> list){
+        if (root == null)
+            return;
+        list.add(root);
+        po(root.left, list);
+        po(root.right, list);
+    }
+
+    /**
+     * Leecode 116. 填充每个节点的下一个右侧节点指针
+     */
+    public Node connect(Node root) {
+        // 层次遍历，挺无聊的题
+        if (root == null)
+            return null;
+        LinkedList<Node> list = new LinkedList<>();
+        list.add(root);
+        while (!list.isEmpty()){
+            int size = list.size();
+            for (int i = 0; i < size; i++) {
+                Node node = list.removeFirst();
+                if (node.left !=null)
+                    list.add(node.left);
+                if (node.right != null)
+                    list.add(node.right);
+                if (i != size -1){
+                    node.next = list.get(0);
                 }
             }
         }
-        return nodes[1];
+        return root;
     }
+
+    /**
+     * Leecode 654. 最大二叉树
+     */
+    public TreeNode constructMaximumBinaryTree(int[] nums) {
+        return cmb(nums,0, nums.length-1);
+    }
+
+    private TreeNode  cmb(int[] nums, int left, int right){
+        if (left > right)
+            return null;
+        int max = left;
+        for (int i = left + 1; i <= right; i++) {
+            max = nums[max] >= nums[i] ? max : i;
+        }
+        TreeNode node = new TreeNode(nums[max]);
+        node.left = cmb(nums, left, max-1);
+        node.right = cmb(nums, max+1, right);
+        return node;
+    }
+
+
+
 
 
 
@@ -594,6 +665,7 @@ public class TreeProb {
         public int val;
         public Node left;
         public Node right;
+        public Node next;
 
         public Node() {}
 
@@ -601,12 +673,13 @@ public class TreeProb {
             val = _val;
         }
 
-        public Node(int _val,Node _left,Node _right) {
+        public Node(int _val, Node _left, Node _right, Node _next) {
             val = _val;
             left = _left;
             right = _right;
+            next = _next;
         }
-    }
+    };
 
     public static void main(String[] args) {
         TreeProb treeProb = new TreeProb();
