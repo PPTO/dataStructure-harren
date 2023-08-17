@@ -3,6 +3,8 @@ package algorithm;
 import com.sun.org.apache.bcel.internal.generic.NEW;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 public class TreeProb {
 
@@ -641,6 +643,233 @@ public class TreeProb {
         return node;
     }
 
+    /**
+     * Leecode 105. 从前序与中序遍历序列构造二叉树
+     */
+    public TreeNode buildTree(int[] preorder, int[] inorder) {
+        /**
+         * 中左右
+         * 左中右
+         */
+        if (preorder.length == 0 || inorder.length == 0)
+            return null;
+        return bt(preorder, inorder, 0, preorder.length - 1, 0, inorder.length-1);
+    }
+    private TreeNode bt(int[] preorder, int[] inorder, int pl, int pr, int il, int ir){
+        if ( pl > pr || il > ir)
+            return null;
+        TreeNode node = new TreeNode(preorder[pl]);
+        int i = 0;
+        for (i = il; i < ir; i++) {
+            if (inorder[i] == preorder[pl])
+                break;
+        }
+        node.left = bt(preorder, inorder, pl+1, pl + (i - il), il, i - 1);
+        node.right = bt(preorder, inorder, pl + i- il + 1, pr, i + 1, ir);
+        return node;
+    }
+
+
+    /**
+     * Leecode 106. 从中序与后序遍历序列构造二叉树
+     */
+    public TreeNode buildTree1(int[] inorder, int[] postorder) {
+        /**
+         * 左中右
+         * 左右中
+         */
+        if (inorder.length == 0 || postorder.length == 0)
+            return null;
+        return bt1(inorder, postorder, 0, inorder.length - 1, 0, postorder.length-1);
+    }
+    private TreeNode bt1(int[] inorder, int[] postorder, int il, int ir, int pl, int pr){
+        if (il > ir || pl > pr)
+            return null;
+        int p= postorder[pr];
+        TreeNode node = new TreeNode(p);
+        int i = -1;
+        for (i = il; i <= ir; i++) {
+            if (inorder[i] == p)
+                break;
+        }
+        node.left = bt1(inorder, postorder, il, i-1, pl, pl + (i-il) -1);
+        node.right = bt1(inorder, postorder, i + 1, ir, pl + (i - il), pr-1);
+        return node;
+    }
+
+    /**
+     * Leecode 652. 寻找重复的子树（难！）
+     */
+    public List<TreeNode> findDuplicateSubtrees(TreeNode root) {
+        // （难点）遍历方式：只能用后序遍历
+        ArrayList<TreeNode> list = new ArrayList<>();
+        if (root == null)
+            return list;
+        ConcurrentHashMap<String, Integer> map = new ConcurrentHashMap<>();
+        preo(root, list, map);
+        return list;
+    }
+    private String preo(TreeNode node, List<TreeNode> list, ConcurrentMap<String, Integer> map){
+        if (node == null)
+            return "";
+        String left = preo(node.left, list, map);
+        String right = preo(node.right, list, map);
+        String s = left + "," + right + "," + node.val;
+        if (map.containsKey(s) && map.get(s) == 1) {
+            list.add(node);
+        }
+        map.put(
+                s, (map.containsKey(s) ? map.get(s): 0) + 1
+        );
+        return s;
+    }
+
+    /**
+     * 使用递归方法进行遍历，需要创建新的方法进行遍历
+     * 使用非递归方法进行遍历，可在原方法内进行
+     */
+
+    /**
+     * Leecode 230. 二叉搜索树中第K小的元素
+     */
+    private int res_kths;
+    private int k_kths;
+    public int kthSmallest(TreeNode root, int k) {
+        k_kths = k;
+        kths(root);
+        return res_kths;
+    }
+    private void kths(TreeNode root){
+        if (root == null)
+            return;
+        kths(root.left);
+        k_kths--;
+        if (k_kths == 0)
+            res_kths = root.val;
+        kths(root.right);
+    }
+
+    /**
+     * Leecode 538. 把二叉搜索树转换为累加树 / Leecode 1038
+     */
+    private int sum_cbst;
+    public TreeNode convertBST(TreeNode root) {
+        // 中序遍历
+        cbst(root);
+        return root;
+    }
+    private void cbst(TreeNode node){
+        if (node == null)
+            return;
+        cbst(node.right);
+        node.val = node.val + sum_cbst;
+        sum_cbst = node.val;
+        cbst(node.left);
+    }
+
+    // 无需 全局变量 版本（比较牛逼，建议多看看）
+    public TreeNode convertBST01(TreeNode root) {
+        dfs05(root, 0);
+        return root;
+    }
+    private int dfs05(TreeNode root, int parentVal) {
+        if (root == null)
+            return parentVal;
+        root.val += dfs05(root.right, parentVal);
+        return dfs05(root.left, root.val);
+    }
+
+    /**
+     * Leecode 98. 验证二叉搜索树
+     */
+    private boolean isvbst = true;
+    public boolean isValidBST(TreeNode root) {
+        // 由于需要通过左子树 和 右子树 判断 当前节点，因此选择后序遍历（但其实也有先序遍历和中序遍历的解决方案，先序遍历更简单）
+        isvbst(root);
+        return isvbst;
+    }
+    //返回以 root 为根节点的二叉树的最大值和最小值
+    public int[] isvbst(TreeNode root) {
+        if (root.left == null && root.right == null)
+            return new int[]{root.val, root.val};
+        int[] left = null, right = null;
+        if (root.left != null)
+            left = isvbst(root.left);
+        if (root.right != null)
+            right = isvbst(root.right);
+        if (left != null && left[1] >= root.val || right != null && right[0] <= root.val)
+            isvbst = false;
+        return new int[]{
+                left != null ? left[0] : root.val,
+                right != null ? right[1] : root.val};
+    }
+
+    /**
+     * Leecode 700. 二叉搜索树中的搜索
+     */
+    public TreeNode searchBST(TreeNode root, int val) {
+        if (root == null)
+            return null;
+        if (root.val == val)
+            return root;
+        if (root.val < val)
+            return searchBST(root.right, val);
+        if (root.val > val)
+            return searchBST(root.left, val);
+        return null;
+    }
+
+    /**
+     * Leecode 701. 二叉搜索树中的插入操作
+     */
+    public TreeNode insertIntoBST(TreeNode root, int val) {
+        if (root == null)
+            return new TreeNode(val);
+        ibst(root, val);
+        return root;
+    }
+    private void ibst(TreeNode root, int val){
+        if (root.val > val){
+            if (root.left == null)
+                root.left = new TreeNode(val);
+            else
+                ibst(root.left, val);
+        }
+        if (root.val < val){
+            if (root.right == null)
+                root.right = new TreeNode(val);
+            else
+                ibst(root.right, val);
+        }
+    }
+
+    /**
+     * Leecode 450. 删除二叉搜索树中的节点
+     */
+    public TreeNode deleteNode(TreeNode root, int key) {
+        if (root == null)
+            return null;
+        if (root.val == key){
+            if (root.right == null)
+                return root.left;
+            else {
+                TreeNode tmp = root.right;
+                while (tmp.left != null){
+                    tmp = tmp.left;
+                }
+                tmp.left = root.left;
+                return root.right;
+            }
+        }
+        if (root.val < key){
+            root.right = deleteNode(root.right, key);
+        }
+        if (root.val > key){
+            root.left = deleteNode(root.left, key);
+        }
+        return root;
+    }
+
 
 
 
@@ -683,14 +912,23 @@ public class TreeProb {
 
     public static void main(String[] args) {
         TreeProb treeProb = new TreeProb();
-        TreeNode node1 = new TreeNode(1);
-        TreeNode node2 = new TreeNode(2);
-        TreeNode node3 = new TreeNode(3);
-        TreeNode node4 = new TreeNode(4);
+        TreeNode node1 = new TreeNode(0);
+        TreeNode node2 = new TreeNode(0);
+        TreeNode node3 = new TreeNode(0);
+        TreeNode node4 = new TreeNode(0);
+        TreeNode node5 = new TreeNode(0);
+        TreeNode node6 = new TreeNode(0);
+        TreeNode node7 = new TreeNode(0);
+        TreeNode node8 = new TreeNode(0);
+        TreeNode node9 = new TreeNode(0);
         node1.left = node2;
         node1.right = node3;
         node2.left = node4;
-        TreeNode node5 = new TreeNode(4);
-        treeProb.isSubStructure(node1, node5);
+        node3.right = node5;
+        node4.left = node6;
+        node4.right = node7;
+        node5.left = node8;
+        node5.right = node9;
+        List<TreeNode> res = treeProb.findDuplicateSubtrees(node1);
     }
 }
