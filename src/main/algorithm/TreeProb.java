@@ -204,7 +204,7 @@ public class TreeProb {
     }
 
     /**
-     * 剑指 Offer 32 - III. 二叉树层序遍历（难!）
+     * 剑指 Offer 32 - III. 二叉树层序遍历
      * 左->右
      * 右->左
      * 左->右
@@ -507,10 +507,10 @@ public class TreeProb {
     }
 
     /**
-     * Offer 37. 序列化二叉树（难！）
+     * Offer 37. 序列化二叉树（难！）/ Leecode 297
      */
     public String serialize(TreeNode root) {
-        // 层序遍历、思路：怎么序列回来的，怎么序列回去
+        // 层序遍历、思路：怎么序列回来的，怎么序列回去。（前序遍历也可实现）
         if (root == null)
             return "[]";
         LinkedList<TreeNode> queue = new LinkedList<>();
@@ -698,7 +698,7 @@ public class TreeProb {
     }
 
     /**
-     * Leecode 652. 寻找重复的子树（难！）
+     * Leecode 652. 寻找重复的子树
      */
     public List<TreeNode> findDuplicateSubtrees(TreeNode root) {
         // （难点）遍历方式：只能用后序遍历
@@ -870,8 +870,153 @@ public class TreeProb {
         return root;
     }
 
+    /**
+     * Leecode 222. 完全二叉树的节点个数
+     */
+    public int countNodes(TreeNode root) {
+        return -1;
+    }
+
+    /**
+     * Leecode 199
+     * 二叉树的右视图
+     */
+    public List<Integer> rightSideView(TreeNode root) {
+        List<TreeNode> list = new ArrayList<>();
+        ArrayList<Integer> res = new ArrayList<>();
+        if (root == null)
+            return res;
+        list.add(root);
+        while (!list.isEmpty()){
+            int size = list.size();
+            for (int i = 0; i < size; i++) {
+                TreeNode node = list.remove(0);
+                if (node.left != null)
+                    list.add(node.left);
+                if (node.right != null)
+                    list.add(node.right);
+                if (i == size-1)
+                    res.add(node.val);
+            }
+        }
+        return res;
+    }
+
+    /**
+     * 求二叉树根节点到叶子结点的路径和的最小值
+     */
+    public int minPath(TreeNode root){
+        if (root == null)
+            return 0;
+        int left = minPath(root.left);
+        int right = minPath(root.right);
+        return 1 + Math.min(left, right);
+    }
+
+    /**
+     * Leecode 124. 二叉树中的最大路径和
+     */
+    private int maxps = Integer.MIN_VALUE;
+    public int maxPathSum(TreeNode root) {
+        mps(root);
+        return maxps;
+    }
+    // 返回以 root 为根节点的最大单边路径和
+    private int mps(TreeNode root){
+        if (root == null)
+            return 0;
+        int left = mps(root.left);
+        int right = mps(root.right);
+        int sum = root.val + (left < 0 ? 0 : left) + (right < 0 ? 0 : right);
+        maxps = maxps > sum ? maxps : sum;
+        int res =  root.val + Math.max((left < 0 ? 0 : left) , (right < 0 ? 0 : right));
+        return res;
+    }
+
+    /**
+     * Leecode 112. 路径总和
+     */
+    public boolean hasPathSum(TreeNode root, int targetSum) {
+        if (root == null)
+            return false;
+        //判断是否为叶子节点
+        if (root.left == null && root.right == null)
+            return targetSum - root.val == 0;
+        //否则不是叶子节点，进行递归
+        return hasPathSum(root.left , targetSum-root.val) || hasPathSum(root.right, targetSum - root.val);
+    }
+
+    /**
+     * Leecode 113. 路径总和 II
+     */
+    public List<List<Integer>> pathSum1(TreeNode root, int targetSum) {
+        List<List<Integer>> res = new ArrayList<>();
+        if (root == null)
+            return res;
+        List<Integer> list = new ArrayList<>();
+        ps1(root, targetSum, list, res);
+        return res;
+    }
+    private void ps1(TreeNode root, int target, List<Integer> list, List<List<Integer>> res){
+        if (root.left == null && root.right == null){
+            if (root.val == target){
+                list.add(root.val);
+                res.add( new ArrayList<>(list));
+                // 回溯
+                list.remove(list.size()-1);
+            }
+            return;
+        }
+        list.add(root.val);
+        if (root.left != null)
+            ps1(root.left, target - root.val, list, res);
+        if (root.right != null)
+            ps1(root.right, target - root.val, list, res);
+        // 回溯
+        list.remove(list.size()-1);
+    }
 
 
+    /**
+     * Leecode 129. 求根节点到叶节点数字之和
+     */
+    public int sumNumbers(TreeNode root) {
+        // 前序遍历
+        return sn(root, 0);
+    }
+    // 以 root 为根节点返回的数字之和
+    private int sn(TreeNode root, int num){
+        if (root.left == null && root.right == null){
+            return num * 10 + root.val;
+        }
+        num = num * 10 + root.val;
+        int left = 0, right = 0;
+        if (root.left != null)
+            left = sn(root.left, num);
+        if (root.right != null)
+            right = sn(root.right, num);
+        return left + right;
+    }
+
+    /**
+     * Leecode 543. 二叉树的直径
+     */
+
+    private int max_dbt = 0;
+    public int diameterOfBinaryTree(TreeNode root) {
+        dbt(root);
+        return max_dbt;
+    }
+    private int dbt(TreeNode root){
+        // 以 root 为中间节点半边的长度
+        if (root == null)
+            return 0;
+        int left = dbt(root.left);
+        int right = dbt(root.right);
+        int max = left + right;
+        max_dbt = max_dbt > max ? max_dbt : max;
+        return Math.max(left + 1, right + 1);
+    }
 
 
 
@@ -912,23 +1057,23 @@ public class TreeProb {
 
     public static void main(String[] args) {
         TreeProb treeProb = new TreeProb();
-        TreeNode node1 = new TreeNode(0);
-        TreeNode node2 = new TreeNode(0);
-        TreeNode node3 = new TreeNode(0);
-        TreeNode node4 = new TreeNode(0);
-        TreeNode node5 = new TreeNode(0);
-        TreeNode node6 = new TreeNode(0);
-        TreeNode node7 = new TreeNode(0);
-        TreeNode node8 = new TreeNode(0);
-        TreeNode node9 = new TreeNode(0);
+        TreeNode node1 = new TreeNode(1);
+        TreeNode node2 = new TreeNode(2);
+//        TreeNode node3 = new TreeNode(3);
+//        TreeNode node4 = new TreeNode(0);
+//        TreeNode node5 = new TreeNode(0);
+//        TreeNode node6 = new TreeNode(0);
+//        TreeNode node7 = new TreeNode(0);
+//        TreeNode node8 = new TreeNode(0);
+//        TreeNode node9 = new TreeNode(0);
         node1.left = node2;
-        node1.right = node3;
-        node2.left = node4;
-        node3.right = node5;
-        node4.left = node6;
-        node4.right = node7;
-        node5.left = node8;
-        node5.right = node9;
-        List<TreeNode> res = treeProb.findDuplicateSubtrees(node1);
+//        node1.right = node3;
+//        node2.left = node4;
+//        node3.right = node5;
+//        node4.left = node6;
+//        node4.right = node7;
+//        node5.left = node8;
+//        node5.right = node9;
+        treeProb.diameterOfBinaryTree(node1);
     }
 }
