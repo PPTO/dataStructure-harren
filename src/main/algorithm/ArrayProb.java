@@ -695,6 +695,22 @@ public class ArrayProb {
     }
 
     /**
+     * 归并法找出数组的最大 / 最小值
+     */
+    public int FindMin(int[] array){
+        return findMin(array, 0, array.length - 1);
+    }
+
+    public int findMin(int[] array ,int low,int high){
+        if (low == high)
+            return array[low];
+        int mid = (low + high) / 2;
+        int min1 = findMin(array, low, mid);
+        int min2 = findMin(array, mid + 1, high);
+        return Math.min(min1, min2);
+    }
+
+    /**
      * Leecode 31. 下一个排列
      */
     public void nextPermutation(int[] nums) {
@@ -714,6 +730,42 @@ public class ArrayProb {
         }
         Arrays.sort(nums, i, nums.length);
     }
+
+
+    /**
+     * Leecode 134. 加油站（难！）
+     */
+    public int canCompleteCircuit(int[] gas, int[] cost) {
+        // 只要总油量大于等于总耗油量就肯定能跑完一圈
+
+        return -1;
+    }
+
+    /**
+     * Leecode 15. 三数之和（难）
+     */
+    public List<List<Integer>> threeSum(int[] nums) {
+        List<List<Integer>> list = new ArrayList<>();
+        // 排序 + 遍历 + 两数之和
+        int[] array = IntStream.of(nums).sorted().toArray();
+        for (int i = 0; i < array.length; i++) {
+            int a = array[i];
+            int l = i + 1, r = array.length - 1;
+            while (l < r){
+                if (array[l] + array[r] < a)
+                    l++;
+                else if (array[l] + array[r] > a)
+                    r--;
+                else {
+                    list.add(Arrays.asList(a, nums[l++], nums[r--]));
+                }
+            }
+        }
+        return list;
+    }
+
+
+
 
     /**
      * Leecode 752. 打开转盘锁
@@ -1004,7 +1056,33 @@ public class ArrayProb {
 
 
 
+    /**
+     * Leecode 75. 颜色分类
+     */
+    public void sortColors(int[] nums) {
+        // 快排，也可以用双指针，时间复杂度 O(n)
+        quicks(nums, 0, nums.length-1);
+    }
 
+    private void quicks(int[] nums, int left, int right){
+        if (left >= right)
+            return;
+        int l = left, r = right;
+        int tmp = nums[l];
+        while (l < r){
+            while (l < r && nums[r] >= tmp)
+                r--;
+            if (l < r)
+                nums[l++] = nums[r];
+            while (l < r && nums[l] < tmp)
+                l++;
+            if (l < r)
+                nums[r--] = nums[l];
+        }
+        nums[l] = tmp;
+        quicks(nums, left, l-1);
+        quicks(nums, l + 1, right);
+    }
 
 
 
