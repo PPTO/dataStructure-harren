@@ -737,12 +737,21 @@ public class ArrayProb {
      */
     public int canCompleteCircuit(int[] gas, int[] cost) {
         // 只要总油量大于等于总耗油量就肯定能跑完一圈
-
-        return -1;
+        int gasAdd = 0, costAdd = 0, cur = 0, begin = 0;
+        for (int i = 0; i < gas.length; i++) {
+            gasAdd += gas[i];
+            costAdd += cost[i];
+            cur += gas[i] - cost[i];
+            if (cur < 0){
+                cur = 0;
+                begin = i+1;
+            }
+        }
+        return gasAdd >= costAdd ? begin : -1;
     }
 
     /**
-     * Leecode 15. 三数之和（难）
+     * Leecode 15. 三数之和（难！）
      */
     public List<List<Integer>> threeSum(int[] nums) {
         List<List<Integer>> list = new ArrayList<>();
@@ -752,13 +761,22 @@ public class ArrayProb {
             int a = array[i];
             int l = i + 1, r = array.length - 1;
             while (l < r){
-                if (array[l] + array[r] < a)
+                if (array[l] + array[r] + a < 0)
                     l++;
-                else if (array[l] + array[r] > a)
+                else if (array[l] + array[r] + a > 0)
                     r--;
                 else {
-                    list.add(Arrays.asList(a, nums[l++], nums[r--]));
+                    list.add(Arrays.asList(a, array[l++], array[r--]));
+                    //更新left 和 right
+                    while (l < r && array[l] == array[l-1])
+                        l ++;
+                    while (l < r &&  array[r] == array[r +1])
+                        r--;
                 }
+            }
+            //找到下一个不相等的数
+            while (i < array.length-1 && array[i] == array[i+1]){
+                i++;
             }
         }
         return list;
@@ -1045,10 +1063,148 @@ public class ArrayProb {
         return area;
     }
 
+    /**
+     * Leecode 135
+     * 分发糖果
+     */
+    public int candy(int[] ratings) {
+        // 类似于 接雨水，每个数字下标的值都需要相邻的的下标进行判定，因此思路即为：左遍历 + 右遍历
+        int[] point = new int[ratings.length];
+        point[0] = 1;
+        // 右遍历
+        for (int i = 1; i <point.length; i++) {
+            point[i] = ratings[i] > ratings[i-1] ? point[i-1] + 1 : 1;
+        }
+        // 左遍历
+        for (int i = point.length-2; i >= 0; i--) {
+            point[i] = ratings[i] > ratings[i + 1] ? Math.max(point[i+1] + 1, point[i]) : point[i];
+        }
+        return IntStream.of(point).sum();
+    }
+
+    /**
+     * Leecode 33. 搜索旋转排序数组
+     */
+    public int search3(int[] nums, int target) {
+        int left = 0, right = nums.length-1;
+        while (left <= right){
+            int mid = (left + right)/2;
+            if (nums[mid] == target){
+                return mid;
+            }
+            // 左有序
+            if (nums[mid] >= nums[left]){
+                if (target < nums[mid] && target >= nums[left]){
+                    right = mid -1;
+                }
+                else {
+                    left = mid + 1;
+                }
+            }
+           // 右有序
+            if (nums[mid] < nums[right]){
+                if (target > nums[mid] && target <= nums[right]){
+                    left = mid + 1;
+                }
+                else {
+                    right = mid -1;
+                }
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * Leecode 870. 优势洗牌 / 田忌赛马 （难！）
+     */
+    public int[] advantageCount(int[] nums1, int[] nums2) {
+        // 贪心算法： 最小的对最小的，如果最小的对不上最小的，就对最大的
+        // 难点：存储下标位置
+        int length = nums1.length;
+        Integer[] array1 = new Integer[length];
+        Integer[] array2 = new Integer[length];
+        for (int i = 0; i < length; i++) {
+            array1[i] = i;
+            array2[i] = i;
+        }
+        Arrays.sort(array1, (i, j) -> nums1[i] - nums1[j]);
+        Arrays.sort(array2, (i, j) -> nums2[i] - nums2[j]);
+
+        int[] ans = new int[length];
+        int j = 0, k = length-1;
+        for (int i = 0; i < length; i++) {
+            int num = nums1[array1[i]];
+            if (num > nums2[array2[j]]){
+                ans[array2[j]] = num;
+                j++;
+            }
+            else {
+                // num <= nums2[array2[j]]
+                ans[array2[k]] = num;
+                k--;
+            }
+        }
+        return ans;
+    }
+
+    /**
+     * Leecode 1. 两数之和
+     */
+    public int[] twoSum1(int[] nums, int target) {
+        // 排序 + 双指针
+        int length = nums.length;
+        Integer[] index = new Integer[length];
+        for (int i = 0; i < length; i++) {
+            index[i] = i;
+        }
+        Arrays.sort(index, (i, j) -> nums[i] - nums[j]);
+        int[] ans = new int[2];
+        int l = 0, r = length-1;
+        while (l < r){
+            if (nums[index[l]] + nums[index[r]] == target)
+                return new int[]{index[l] , index[r]};
+            else if (nums[index[l]] + nums[index[r]] > target)
+                r--;
+            else
+                l++;
+        }
+        return null;
+    }
+
+    /**
+     * Leecode 167. 两数之和 II - 输入有序数组
+     */
+    public int[] twoSum2(int[] numbers, int target) {
+        //双指针
+        int length = numbers.length;
+        int l = 0, r = length-1;
+        while (l < r){
+            if (numbers[l] + numbers[r] == target)
+                return new int[]{l + 1, r + 1};
+            else if (numbers[l] + numbers[r] < target)
+                l++;
+            else
+                r--;
+        }
+        return null;
+    }
+
+    /**
+     * Leecode 88. 合并两个有序数组
+     */
+    public void merge(int[] nums1, int m, int[] nums2, int n) {
 
 
+    }
 
+    /**
+     * 一个先递增再递减的数组，如何找到第K大的数。注.数字可以重复
+     * [1，1，3，4，6，8，3，2，2，1]
+     */
+    public int findKthnum(int[] nums, int k){
 
+        return -1;
+    }
 
 
 
@@ -1097,6 +1253,18 @@ public class ArrayProb {
 
         int[][] area = {{0,0,1,0,0,0,0,1,0,0,0,0,0},{0,0,0,0,0,0,0,1,1,1,0,0,0},{0,1,1,0,1,0,0,0,0,0,0,0,0},{0,1,0,0,1,1,0,0,1,0,1,0,0},{0,1,0,0,1,1,0,0,1,1,1,0,0},{0,0,0,0,0,0,0,0,0,0,1,0,0},{0,0,0,0,0,0,0,1,1,1,0,0,0},{0,0,0,0,0,0,0,1,1,0,0,0,0}};
         arrayProb.maxAreaOfIsland(area);
+
+        int[] a = {-1,0,1,2,-1,-4};
+        arrayProb.threeSum(a);
+
+        int[] gas = {1, 2, 3, 4, 5};
+        int[] cost = {3, 4, 5, 1, 2};
+        int i = arrayProb.canCompleteCircuit(gas, cost);
+
+
+        int[] arr1 = {2,7,11,15};
+        int[] arr2 = {1,10,4,11};
+        arrayProb.advantageCount(arr1, arr2);
 
     }
 }
