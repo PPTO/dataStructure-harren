@@ -778,7 +778,7 @@ public class ArrayProb {
      * Leecode 1. 两数之和
      */
     public int[] twoSum1(int[] nums, int target) {
-        // 排序 + 双指针
+        // 排序 + 双指针, 或使用 map
         int length = nums.length;
         Integer[] index = new Integer[length];
         for (int i = 0; i < length; i++) {
@@ -820,24 +820,104 @@ public class ArrayProb {
      * Leecode 88. 合并两个有序数组
      */
     public void merge(int[] nums1, int m, int[] nums2, int n) {
-
-
+        // 重点：从后往前
+        int i = m-1, j = n-1, k = m + n -1;
+        while (j >= 0){
+            if (i < 0 || nums1[i] <= nums2[j])
+                nums1[k--] = nums2[j--];
+            else
+                nums1[k--] = nums1[i--];
+        }
     }
 
     /**
-     * 一个先递增再递减的数组，如何找到第K大的数。注.数字可以重复
+     * 一个先递增再递减的数组，如何找到第 K 小的数。注.数字可以重复
      * [1，1，3，4，6，8，3，2，2，1]
      */
     public int findKthnum(int[] nums, int k){
-
+        int l = 0, r = nums.length-1;
+        while (l <= r){
+            int min = Math.min(nums[l], nums[r]);
+            if (--k == 0)
+                return min;
+            while (nums[l] == min)
+                l++;
+            while (nums[r] == min)
+                r--;
+        }
         return -1;
     }
 
+    /**
+     * Leecode 1109. 航班预订统计
+     */
+    public int[] corpFlightBookings(int[][] bookings, int n) {
+        int[] ans = new int[n];
+        for (int i = 0; i < bookings.length; i++) {
+            for (int j = bookings[i][0] - 1; j < bookings[i][1]; j++) {
+                ans[j] += bookings[i][2];
+            }
+        }
+        return ans;
+    }
 
+    /**
+     * Leecode 1288. 删除被覆盖区间
+     */
+    public int removeCoveredIntervals(int[][] intervals) {
+        // 排序题
+        Arrays.sort(intervals, (o1, o2) -> o1[0] == o2[0] ? o2[1] - o1[1] : o1[0] - o2[0]);
+        int r = intervals[0][1], l = intervals[0][0];
+        int size = intervals.length;
+        for (int i = 1; i < intervals.length; i++) {
+            if (intervals[i][1] <= r)
+                size--;
+            else {
+                r = intervals[i][1];
+            }
+        }
+        return size;
+    }
 
+    /**
+     * Leecode 56. 合并区间
+     */
+    public int[][] merge(int[][] intervals) {
+        // 同上，排序题
+        Arrays.sort(intervals, (o1, o2) -> o1[0] - o2[0]);
+        List<int[]> list = new ArrayList<>();
+        int l = intervals[0][0], r = intervals[0][1];
+        for (int i = 1; i <intervals.length; i++) {
+            if (intervals[i][0] <= r){
+                r = Math.max(r, intervals[i][1]);
+            }
+            else {
+                // 更新
+                list.add(new int[]{l, r});
+                l = intervals[i][0];
+                r = intervals[i][1];
+            }
+        }
+        list.add(new int[]{l, r});
+        return list.toArray(new int[list.size()][]);
+    }
 
+    /**
+     * Leecode 986. 区间列表的交集
+     */
+    public int[][] intervalIntersection(int[][] firstList, int[][] secondList) {
 
+        return null;
+    }
 
+    /**
+     * Leecode 452. 用最少数量的箭引爆气球
+     */
+    public int findMinArrowShots(int[][] points) {
+        // 排序
+
+        return -1;
+    }
 
     /**
      * Leecode 75. 颜色分类
@@ -889,9 +969,11 @@ public class ArrayProb {
         int i = arrayProb.canCompleteCircuit(gas, cost);
 
 
-        int[] arr1 = {2,7,11,15};
-        int[] arr2 = {1,10,4,11};
-        arrayProb.advantageCount(arr1, arr2);
+        int[] arr1 = {0,0,0,0,0};
+        int[] arr2 = {1,2,3,4,5};
+        arrayProb.merge(arr1,0,arr2,5);
 
+        int[] ints = {1,1,3,4,6,8,3,2,2,1};
+        System.out.println(arrayProb.findKthnum(ints, 2));
     }
 }

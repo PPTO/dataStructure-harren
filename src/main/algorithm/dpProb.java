@@ -4,7 +4,6 @@ import java.util.stream.IntStream;
 
 public class dpProb {
 
-
     /**
      * Offer 10- I. 斐波那契数列
      */
@@ -40,7 +39,7 @@ public class dpProb {
     }
 
     /**
-     * 0-1背包问题
+     * 0-1 背包问题
      * 问题：一个可装载重量为 W 的背包和 N 个物品，每个物品有重量和价值两个属性。
      *      现在让你用这个背包装物品，最多能装的价值是多少？（注意. 每个物品只能装一个）
      *  求最大值（动态规划）
@@ -68,7 +67,6 @@ public class dpProb {
         }
         return dp[n][w];
     }
-
 
     /**
      * Leecode 42. 接雨水
