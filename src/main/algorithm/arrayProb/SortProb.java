@@ -99,4 +99,78 @@ public class SortProb {
     }
 
 
+    /**
+     * Offer 51. 数组中的逆序对
+     */
+    public int reversePairs(int[] nums) {
+        // 归并排序
+        return mergeSort(nums, 0, nums.length-1);
+    }
+
+    /**
+     * 排序
+     * @return 逆序对数
+     */
+    private int mergeSort(int[] nums, int h, int t){
+        if (h >= t)
+            return 0;
+        int mid = (h + t)/2;
+        int num = 0;
+        int i = mergeSort(nums, h, mid);
+        int j = mergeSort(nums, mid + 1, t);
+        //优化! 不优化有一个示例会超时！
+        if (nums[mid] <= nums[mid + 1])
+            return i + j;
+        int[] array = new int[nums.length];
+        int m = h, n = mid + 1, o = h;
+        while (m <= mid && n <= t){
+            if (nums[n] < nums[m]){
+                num += mid - m + 1;
+                array[o++] = nums[n++];
+            }
+            else {
+                array[o++] = nums[m++];
+            }
+        }
+        while (m <= mid){
+            array[o++] = nums[m++];
+        }
+        while (n <= t){
+            array[o++] = nums[n++];
+        }
+        for (int k = h; k <=t; k++) {
+            nums[k] = array[k];
+        }
+        return i + j + num;
+    }
+
+    /**
+     * Leecode 75. 颜色分类
+     */
+    public void sortColors(int[] nums) {
+        // 快排，也可以用双指针，时间复杂度 O(n)
+        quicks(nums, 0, nums.length-1);
+    }
+
+    private void quicks(int[] nums, int left, int right){
+        if (left >= right)
+            return;
+        int l = left, r = right;
+        int tmp = nums[l];
+        while (l < r){
+            while (l < r && nums[r] >= tmp)
+                r--;
+            if (l < r)
+                nums[l++] = nums[r];
+            while (l < r && nums[l] < tmp)
+                l++;
+            if (l < r)
+                nums[r--] = nums[l];
+        }
+        nums[l] = tmp;
+        quicks(nums, left, l-1);
+        quicks(nums, l + 1, right);
+    }
+
+
 }

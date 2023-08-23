@@ -96,6 +96,25 @@ public class dpProb {
     }
 
     /**
+     * Leecode 135
+     * 分发糖果
+     */
+    public int candy(int[] ratings) {
+        // 类似于 接雨水，每个数字下标的值都需要相邻的的下标进行判定，因此思路即为：左遍历 + 右遍历
+        int[] point = new int[ratings.length];
+        point[0] = 1;
+        // 右遍历
+        for (int i = 1; i <point.length; i++) {
+            point[i] = ratings[i] > ratings[i-1] ? point[i-1] + 1 : 1;
+        }
+        // 左遍历
+        for (int i = point.length-2; i >= 0; i--) {
+            point[i] = ratings[i] > ratings[i + 1] ? Math.max(point[i+1] + 1, point[i]) : point[i];
+        }
+        return IntStream.of(point).sum();
+    }
+
+    /**
      * Offer 60. n个骰子的点数（难！）
      */
     public double[] dicesProbability(int n) {

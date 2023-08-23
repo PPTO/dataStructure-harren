@@ -19,8 +19,11 @@ public class FindProb {
      * Important!
      * 二分法：
      * 若 while(low < high)，则可以跟 high = mid，在 while 后根据 low 进行 return
-     * 若 while(low <= high)，则需要跟 high = mid -1，（或）在 while 里 return。
+     * 若 while(low <= high)，则需要跟 low = mid -1，（或）在 while 里 return。
      * low 必须是 low = mid +1;
+     *
+     * Important!
+     * 当你发现一道题可以用 遍历 来解决时， 可以尝试使用 二分法 来优化时间复杂度
      */
 
     /**
@@ -244,6 +247,88 @@ public class FindProb {
         }
         k--;
         return k <0 ? false : true;
+    }
+
+
+    /**
+     * Offer 53 - I. 在排序数组中查找数字 I
+     * 遍历的时间复杂度：0(n)
+     * 二分法时间复杂度：O(log_2 n)
+     */
+    public int search2(int[] nums, int target) {
+        //二分法找最左目标值
+        int h = 0, t = nums.length-1;
+        while (h < t){
+            int mid = (h + t) / 2;
+            if (nums[mid] == target){
+                t = mid;
+            }
+            else if (nums[mid] > target){
+                t = mid -1;
+            }
+            else if (nums[mid] < target){
+                h = mid +1;
+            }
+        }
+        int res = 0;
+        while (h < nums.length && nums[h] == target){
+            res++;
+            h++;
+        }
+        return res;
+    }
+
+    /**
+     * Offer 53 - II. 0～n-1中缺失的数字 （难！）
+     */
+    public int missingNumber(int[] nums) {
+        // 二分法找第一个（最左）未排序的位置
+        int h = 0, t = nums.length-1;
+        while (h < t){
+            int mid = (h + t) / 2;
+            if (nums[mid] != mid){
+                t = mid;
+            }
+            else if (nums[mid] == mid){
+                h = mid + 1;
+            }
+        }
+        if (h == nums.length-1){
+            return nums[h] == h ? h+1 : h;
+        }
+        return h;
+    }
+
+    /**
+     * Leecode 33. 搜索旋转排序数组
+     */
+    public int search3(int[] nums, int target) {
+        int left = 0, right = nums.length-1;
+        while (left <= right){
+            int mid = (left + right)/2;
+            if (nums[mid] == target){
+                return mid;
+            }
+            // 左有序
+            if (nums[mid] >= nums[left]){
+                if (target < nums[mid] && target >= nums[left]){
+                    right = mid -1;
+                }
+                else {
+                    left = mid + 1;
+                }
+            }
+            // 右有序
+            if (nums[mid] < nums[right]){
+                if (target > nums[mid] && target <= nums[right]){
+                    left = mid + 1;
+                }
+                else {
+                    right = mid -1;
+                }
+            }
+        }
+        return -1;
     }
 
 }
