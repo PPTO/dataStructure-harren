@@ -839,6 +839,44 @@ public class ArrayProb {
         }
     }
 
+    /**
+     * Leecode 77. 组合
+     */
+    public List<List<Integer>> combine(int n, int k) {
+        List<List<Integer>> lists = new ArrayList<>();
+        List<Integer> list = new ArrayList<>();
+        com(lists, list, n, k);
+        return lists;
+    }
+
+    private void com(List<List<Integer>> lists, List<Integer> list, int n, int k){
+        if (k == 0){
+            lists.add(new ArrayList<>(list));
+            return;
+        }
+        for (int i = n; i >0; i--) {
+            list.add(i);
+            com(lists, list, i-1, k-1);
+            list.remove(list.size()-1);
+        }
+    }
+
+    /**
+     * Leecode 22. 括号生成（难！）
+     */
+    public List<String> generateParenthesis(int n) {
+        String s= "";
+        ArrayList<String> list = new ArrayList<>();
+
+
+        return list;
+    }
+    private void gp(int n, int m, ArrayList<String> list, String s){
+
+    }
+
+
+
 
 
 
