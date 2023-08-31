@@ -1,5 +1,8 @@
 package algorithm;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+
 public class ListProb {
 
     /**
@@ -423,10 +426,73 @@ public class ListProb {
         return head.next;
     }
 
+    /**
+     * Leecode 143. 重排链表
+     */
+    public void reorderList(ListNode head) {
+        LinkedList<ListNode> list = new LinkedList<>();
+        ListNode tmp = head;
+        while (tmp != null){
+            list.addLast(tmp);
+            tmp = tmp.next;
+        }
+        ListNode node = list.removeFirst();
+        int flag = 0;
+        while (!list.isEmpty()){
+            tmp = flag == 0 ? list.removeLast() : list.removeFirst();
+            flag = (flag + 1) % 2;
+            node.next = tmp;
+            node = tmp;
+            if (list.isEmpty())
+                node.next = null;
+        }
+    }
 
+    /**
+     * Leecode 19. 删除链表的倒数第 N 个结点（难！）
+     */
+    public ListNode removeNthFromEnd(ListNode head, int n) {
 
+        return null;
+    }
 
+    /**
+     * Leecode 876. 链表的中间结点，如果有两个中间结点，则返回第二个中间结点。
+     */
+    public ListNode middleNode(ListNode head) {
+        // 快慢指针
+        ListNode slow = head, fast = head;
+        while (fast.next != null){
+            slow = slow.next;
+            fast = fast.next;
+            if (fast.next != null)
+                fast = fast.next;
+            else
+                break;
+        }
+        return slow;
+    }
 
+    //返回中间节点的前一个节点
+    public ListNode middleNode02(ListNode head) {
+
+        return null;
+    }
+
+    /**
+     * Leecode 148. 排序链表（难！）
+     */
+    public ListNode sortList(ListNode head) {
+        // 冒泡排序
+        ListNode node = head;
+        while (node != null && node.next != null){
+            if (node.val > node.next.val){
+                ListNode tmp = node;
+
+            }
+        }
+        return null;
+    }
 
 
 
