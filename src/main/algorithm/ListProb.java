@@ -194,6 +194,26 @@ public class ListProb {
     }
 
     /**
+     * Leecode 24. 两两交换链表中的节点
+     */
+    public ListNode swapPairs(ListNode head) {
+        ListNode tmp = head;
+        int num = 2;
+        while ( num-- >1 && tmp != null){
+            tmp = tmp.next;
+        }
+        if (tmp != null){
+            ListNode next_head = tmp.next;
+            ListNode node = reverseListN(head, 2);
+            head.next = swapPairs(next_head);
+            return node;
+        }
+        else {
+            return  head;
+        }
+    }
+
+    /**
      * Offer52 两个链表的第一个公共节点 / Leecode 160. 相交链表
      * 指针相遇法，
      * 时间复杂度：O(a + b)

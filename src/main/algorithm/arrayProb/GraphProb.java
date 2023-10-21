@@ -57,10 +57,6 @@ public class GraphProb {
     }
 
     /**
-     * 使用递归记得用 返回值 记录结果
-     */
-
-    /**
      * Leecode 695. 岛屿的最大面积
      */
     public int maxAreaOfIsland(int[][] grid) {
@@ -78,6 +74,9 @@ public class GraphProb {
         }
         return max == Integer.MIN_VALUE ? 0 : max;
     }
+    /**
+     * 使用递归记得用 返回值 记录结果
+     */
     private int mai(int[][] grid, int[] X, int[] Y, int x, int y){
         if (grid[x][y] == 0){
             return 0;
@@ -95,5 +94,47 @@ public class GraphProb {
             }
         }
         return area;
+    }
+
+    /**
+     * Leecode 48. 旋转图像
+     */
+    public void rotate(int[][] matrix) {
+        // matrix[i][j] → matrix[j][n−1−i]
+        int n = matrix.length;
+        for (int i = 0; i < n / 2; i++) {
+            for (int j = i; j < n-i-1; j++) {
+                int tmp = matrix[i][j];
+                matrix[i][j] = matrix[n-1-j][i];
+                matrix[n-1-j][i] = matrix[n-1-i][n-1-j];
+                matrix[n-1-i][n-1-j] = matrix[j][n-1-i];
+                matrix[j][n-1-i] = tmp;
+            }
+        }
+    }
+
+    /**
+     * Leecode 240. 搜索二维矩阵 II
+     */
+    public boolean searchMatrix(int[][] matrix, int target) {
+        // 贪心算法，将矩阵逆时针旋转 45° ，并将其转化为图形式，发现其类似于 二叉搜索树
+        int left = 0, right = matrix[0].length-1;
+        while (left < matrix.length && left >= 0 && right >= 0 && right < matrix[0].length){
+            if (target == matrix[left][right])
+                return true;
+            else if (target < matrix[left][right])
+                right--;
+            else if (target > matrix[left][right])
+                left++;
+        }
+        return false;
+    }
+
+
+
+
+
+    public static void main(String[] args) {
+        GraphProb gp = new GraphProb();
     }
 }

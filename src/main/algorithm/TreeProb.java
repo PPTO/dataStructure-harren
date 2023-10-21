@@ -250,8 +250,7 @@ public class TreeProb {
     }
 
     /**
-     *Offer28
-     * 对称的二叉树
+     *Offer28 对称的二叉树 / Leecode 101. 对称二叉树
      */
     public boolean isSymmetric(TreeNode root) {
         if (root == null)
@@ -290,7 +289,7 @@ public class TreeProb {
     }
 
     /**
-     * Offer 55 - I. 二叉树的深度
+     * Offer 55 - I. 二叉树的深度 / Leecode 104. 二叉树的最大深度
      */
     public int maxDepth(TreeNode root) {
         int depth = 0;
@@ -314,7 +313,7 @@ public class TreeProb {
     }
 
     /**
-     * Offer 55 - II. 平衡二叉树
+     * Offer 55 - II. 平衡二叉树 / Leecode 110. 平衡二叉树
      */
     private boolean balanceFlag = true;
     public boolean isBalanced(TreeNode root) {
@@ -780,7 +779,7 @@ public class TreeProb {
     }
 
     /**
-     * Leecode 98. 验证二叉搜索树
+     * Leecode 98. 验证二叉搜索树 / Leecode 98. 验证二叉搜索树
      */
     private boolean isvbst = true;
     public boolean isValidBST(TreeNode root) {
@@ -1016,6 +1015,44 @@ public class TreeProb {
         int max = left + right;
         max_dbt = max_dbt > max ? max_dbt : max;
         return Math.max(left + 1, right + 1);
+    }
+
+    /**
+     * Leecode 662. 二叉树最大宽度
+     */
+    public int widthOfBinaryTree(TreeNode root) {
+        // 编号 + 层序遍历
+        if (root == null)
+            return 0;
+        LinkedList<TreeNode> list = new LinkedList<>();
+        HashMap<TreeNode, Integer> map = new HashMap<>();
+        list.addLast(root);
+        map.put(root,1);
+        int max = 0;
+        while (!list.isEmpty()){
+            int left = 0, right = 0;
+            int size = list.size();
+            for (int i = 0; i < size; i++) {
+                TreeNode node = list.removeFirst();
+                Integer num = map.remove(node);
+                if (left == 0){
+                    left = num;
+                    right = num;
+                }
+                else
+                    right = num;
+                if (node.left != null){
+                    list.addLast(node.left);
+                    map.put(node.left, num * 2);
+                }
+                if (node.right != null){
+                    list.addLast(node.right);
+                    map.put(node.right, num * 2 + 1);
+                }
+            }
+            max = right - left + 1 > max ? right - left +1: max;
+        }
+        return max;
     }
 
 

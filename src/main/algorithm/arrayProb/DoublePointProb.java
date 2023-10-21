@@ -3,6 +3,8 @@ package algorithm.arrayProb;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.IntStream;
 
 public class DoublePointProb {
 
@@ -87,6 +89,38 @@ public class DoublePointProb {
     }
 
     /**
+     * Leecode 15. 三数之和（难！）
+     */
+    public List<List<Integer>> threeSum(int[] nums) {
+        List<List<Integer>> list = new ArrayList<>();
+        // 排序 + 遍历 + 两数之和（双指针）
+        int[] array = IntStream.of(nums).sorted().toArray();
+        for (int i = 0; i < array.length; i++) {
+            int a = array[i];
+            int l = i + 1, r = array.length - 1;
+            while (l < r){
+                if (array[l] + array[r] + a < 0)
+                    l++;
+                else if (array[l] + array[r] + a > 0)
+                    r--;
+                else {
+                    list.add(Arrays.asList(a, array[l++], array[r--]));
+                    //更新left 和 right
+                    while (l < r && array[l] == array[l-1])
+                        l ++;
+                    while (l < r &&  array[r] == array[r +1])
+                        r--;
+                }
+            }
+            //找到下一个不相等的数
+            while (i < array.length-1 && array[i] == array[i+1]){
+                i++;
+            }
+        }
+        return list;
+    }
+
+    /**
      * Leecode 1. 两数之和
      */
     public int[] twoSum1(int[] nums, int target) {
@@ -144,6 +178,60 @@ public class DoublePointProb {
                 r--;
         }
         return -1;
+    }
+
+    /**
+     * Leecode 1004. 最大连续 1 的个数 III
+     */
+    public int longestOnes(int[] nums, int k) {
+        return -1;
+    }
+
+    /**
+     * Leecode 11. 盛最多水的容器
+     */
+    public int maxArea(int[] height) {
+        // 双指针
+        int i = 0, j = height.length-1;
+        int ans = 0;
+        while (i < j){
+            int tmp = Math.min(height[i], height[j]) * (j-i);
+            ans = Math.max(ans, tmp);
+            if (height[i] >= height[j])
+                j--;
+            else
+                i++;
+        }
+        return ans;
+    }
+
+    /**
+     * Leecode 209. 长度最小的子数组
+     */
+    public int minSubArrayLen(int target, int[] nums) {
+        //区间[left, right]
+        int left = 0, right = 0;
+        int cur = nums[0];
+        int min = Integer.MAX_VALUE;
+        while (right < nums.length){
+            while (cur < target && ++right < nums.length) {
+                cur += nums[right];
+            }
+            while (left <= right && cur >= target){
+                min = Math.min(min, right - left+1);
+                cur -= nums[left];
+                left++;
+            }
+            if (left > right)
+                right = left;
+        }
+        return min == Integer.MAX_VALUE ? 0 : min;
+    }
+
+    public static void main(String[] args) {
+        DoublePointProb dpp = new DoublePointProb();
+        int[] ints = {2,3,1,2,4,3};
+        dpp.minSubArrayLen(7,ints);
     }
 
 

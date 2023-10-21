@@ -140,6 +140,23 @@ public class MathProb {
         return ans;
     }
 
+    /**
+     * Leecode 470. 用 Rand7() 实现 Rand10() （难！）
+     */
+    public int rand10() {
+        int row, col, idx;
+        do {
+            row = rand7();
+            col = rand7();
+            idx = col + (row - 1) * 7;
+        } while (idx > 40);
+        //难点：当取值为 10 时
+        return 1 + (idx - 1) % 10;
+    }
+    private int rand7() {
+        return -1;
+    }
+
     public static void main(String[] args) {
         System.out.println(-3 % 2);
     }

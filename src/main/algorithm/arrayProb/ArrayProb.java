@@ -175,38 +175,6 @@ public class ArrayProb {
     }
 
     /**
-     * Leecode 15. 三数之和（难！）
-     */
-    public List<List<Integer>> threeSum(int[] nums) {
-        List<List<Integer>> list = new ArrayList<>();
-        // 排序 + 遍历 + 两数之和
-        int[] array = IntStream.of(nums).sorted().toArray();
-        for (int i = 0; i < array.length; i++) {
-            int a = array[i];
-            int l = i + 1, r = array.length - 1;
-            while (l < r){
-                if (array[l] + array[r] + a < 0)
-                    l++;
-                else if (array[l] + array[r] + a > 0)
-                    r--;
-                else {
-                    list.add(Arrays.asList(a, array[l++], array[r--]));
-                    //更新left 和 right
-                    while (l < r && array[l] == array[l-1])
-                        l ++;
-                    while (l < r &&  array[r] == array[r +1])
-                        r--;
-                }
-            }
-            //找到下一个不相等的数
-            while (i < array.length-1 && array[i] == array[i+1]){
-                i++;
-            }
-        }
-        return list;
-    }
-
-    /**
      * Leecode 752. 打开转盘锁
      */
     public int openLock(String[] deadends, String target) {
@@ -336,17 +304,136 @@ public class ArrayProb {
         return ans;
     }
 
+    /**
+     * Leecode 739. 每日温度
+     */
+    public int[] dailyTemperatures(int[] temperatures) {
+        // 重点：存储下标
+        int[] ans = new int[temperatures.length];
+        Stack<int[]> stack = new Stack<>();
+        for (int i = temperatures.length-1; i >=0; i--) {
+            while (!stack.isEmpty() && temperatures[i] >= stack.peek()[0])
+                stack.pop();
+            ans[i] = stack.isEmpty() ? 0 : stack.peek()[1] - i;
+            stack.add(new int[]{temperatures[i], i});
+        }
+        return ans;
+    }
+
+    /**
+     * Leecode 554. 砖墙
+     */
+    public int leastBricks(List<List<Integer>> wall) {
+        // 题目转化为找最多的缝隙
+        HashMap<Integer, Integer> map = new HashMap<>();
+        for (List<Integer> list : wall) {
+            int j = 0;
+            for (int i = 0; i < list.size() - 1; i++) {
+                j += list.get(i);
+                map.put(j, map.get(j) == null ? 1 : map.get(j) + 1);
+            }
+        }
+        int length = wall.size();
+        int ans = 0;
+        for (Integer integer : map.keySet()) {
+            ans = Math.max(ans, map.get(integer));
+        }
+        return length - ans;
+    }
+
+    /**
+     * Leecode 560. 和为 K 的子数组
+     */
+    public int subarraySum(int[] nums, int k) {
+        int ans = 0;
+        for (int i = 0; i < nums.length; i++) {
+            int sum = 0;
+            for (int j = i; j < nums.length; j++) {
+                sum += nums[j];
+                if (sum == k)
+                    ans++;
+            }
+        }
+        return ans;
+    }
+
+    /**
+     * Leecode 162. 寻找峰值
+     */
+    public int findPeakElement(int[] nums) {
+        if (nums.length == 1)
+            return 0;
+        for (int i = 1; i < nums.length - 1; i++) {
+            if (nums[i] > nums[i-1] && nums[i] > nums[i+1])
+                return i;
+        }
+        if (nums[0] > nums[1])
+            return 0;
+        if (nums[nums.length-1] > nums[nums.length-2])
+            return nums.length-1;
+        return 0;
+    }
+
+    /**
+     * Leecode 14. 最长公共前缀
+     */
+    public String longestCommonPrefix(String[] strs) {
+        String s = "";
+        int flag = 0;
+        for (int i = 0; i < strs[0].length(); i++) {
+            char c = strs[0].charAt(i);
+            for (int j = 1; j < strs.length; j++) {
+                if (i >= strs[j].length() || strs[j].charAt(i) != c){
+                    flag = 1;
+                    break;
+                }
+            }
+            if (flag == 1)
+                break;
+            else {
+                s += c;
+            }
+        }
+        return s;
+    }
+
+    /**
+     * Leecode 152. 乘积最大子数组（难！）
+     */
+    public int maxProduct(int[] nums) {
+        // 以当前下标结尾的最大值
+        int imax = nums[0];
+        // 以当前下标结尾的最小值
+        int imin = nums[0];
+        // 最终结果
+        int max = nums[0];
+        for (int i = 1; i < nums.length; i++) {
+            if (nums[i] < 0){
+                // 交换
+                int tmp = imax;
+                imax = imin;
+                imin = tmp;
+            }
+            imax = Math.max(nums[i], imax * nums[i]);
+            imin = Math.min(nums[i], imin * nums[i]);
+            max = Math.max(max, imax);
+        }
+        return max;
+    }
+
+    /**
+     * Leecode 283. 移动零（hard！！）
+     */
+    public void moveZeroes(int[] nums) {
+
+    }
+
+
 
 
     public static void main(String[] args) {
         ArrayProb arrayProb = new ArrayProb();
 
-        int[][] x = {{1,1}};
-
-        int[][] area = {{0,0,1,0,0,0,0,1,0,0,0,0,0},{0,0,0,0,0,0,0,1,1,1,0,0,0},{0,1,1,0,1,0,0,0,0,0,0,0,0},{0,1,0,0,1,1,0,0,1,0,1,0,0},{0,1,0,0,1,1,0,0,1,1,1,0,0},{0,0,0,0,0,0,0,0,0,0,1,0,0},{0,0,0,0,0,0,0,1,1,1,0,0,0},{0,0,0,0,0,0,0,1,1,0,0,0,0}};
-
-        int[] a = {-1,0,1,2,-1,-4};
-        arrayProb.threeSum(a);
 
         int[] gas = {1, 2, 3, 4, 5};
         int[] cost = {3, 4, 5, 1, 2};
@@ -357,6 +444,7 @@ public class ArrayProb {
         int[] arr2 = {1,2,3,4,5};
         arrayProb.merge(arr1,0,arr2,5);
 
-        int[] ints = {1,1,3,4,6,8,3,2,2,1};
+        int[] ints = {2,3,-2,-4};
+        arrayProb.maxProduct(ints);
     }
 }

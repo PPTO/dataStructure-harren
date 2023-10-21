@@ -1,5 +1,6 @@
 package algorithm;
 
+import java.util.List;
 import java.util.stream.IntStream;
 
 public class dpProb {
@@ -232,6 +233,7 @@ public class dpProb {
 
     /**
      * Leecode 322. 零钱兑换（难！初始值的设置）
+     * 返回可以凑成总金额所需的最少的硬币个数 。
      */
     public int coinChange(int[] coins, int amount) {
         int[][] dp = new int[coins.length + 1][amount + 1];
@@ -268,6 +270,7 @@ public class dpProb {
 
     /**
      * Leecode 518 零钱兑换 II（完全背包问题）
+     * 请你计算并返回可以凑成总金额的硬币组合数。
      */
     public int change(int amount, int[] coins) {
         int[][] dp = new int[coins.length + 1][amount + 1];
@@ -393,7 +396,204 @@ public class dpProb {
         return dp[0][dp.length-1];
     }
 
+    /**
+     * Leecode 64. 最小路径和（难！）
+     * 用 dfs 会超时
+     */
+    public int minPathSum(int[][] grid) {
+        // 1. 初始化
+        int[][] dp = new int[grid.length][grid[0].length];
+        int sum = 0;
+        for (int i = 0; i < grid.length; i++){
+            sum += grid[i][0];
+            dp[i][0] = sum;
+        }
+        sum = 0;
+        for (int i = 0; i < grid[0].length; i++){
+            sum += grid[0][i];
+            dp[0][i] = sum;
+        }
+        //2. 遍历
+        for (int i = 1; i < grid.length; i++) {
+            for (int j = 1; j < grid[0].length; j++) {
+                dp[i][j] = grid[i][j] + Math.min(dp[i-1][j], dp[i][j-1]);
+            }
+        }
+        return dp[dp.length-1][dp[0].length-1];
+    }
 
+
+
+    /**
+     * Leecode 63. 不同路径 II
+     * 跟上一题一样，使用 dfs 超时
+     */
+    public int uniquePathsWithObstacles(int[][] obstacleGrid) {
+        int[][] dp = new int[obstacleGrid.length][obstacleGrid[0].length];
+        for (int i = 0; i < dp.length; i++) {
+            if (obstacleGrid[i][0] == 0)
+                dp[i][0] = 1;
+            else
+                break;
+        }
+        for (int i = 0; i < dp[0].length; i++) {
+            if (obstacleGrid[0][i] == 0)
+                dp[0][i] = 1;
+            else break;
+        }
+        for (int i = 1; i < dp.length; i++) {
+            for (int j = 1; j < dp[0].length; j++) {
+                if (obstacleGrid[i][j] == 1)
+                    dp[i][j] = 0;
+                else {
+                    dp[i][j] = dp[i-1][j] + dp[i][j-1];
+                }
+            }
+        }
+        return dp[dp.length-1][dp[0].length-1];
+    }
+
+    /**
+     * Leecode 62. 不同路径
+     */
+    public int uniquePaths(int m, int n) {
+        int[][] dp = new int[m][n];
+        for (int i = 0; i < m; i++) {
+            dp[i][0] = 1;
+        }
+        for (int i = 0; i < n; i++) {
+            dp[0][i] = 1;
+        }
+        for (int i = 1; i <m; i++) {
+            for (int j = 1; j <n; j++) {
+                dp[i][j] = dp[i-1][j] + dp[i][j-1];
+            }
+        }
+        return dp[m-1][n-1];
+    }
+
+    /**
+     * Leecode 221. 最大正方形
+     */
+    public int maximalSquare(char[][] matrix) {
+        int[][] dp = new int[matrix.length][matrix[0].length];
+        int max = 0;
+        for (int i = 0; i < dp.length; i++) {
+            dp[i][0] = matrix[i][0] == '0' ? 0 : 1;
+            max = Math.max(max, dp[i][0]);
+        }
+        for (int i = 0; i < dp[0].length; i++) {
+            dp[0][i] = matrix[0][i] == '0' ? 0 : 1;
+            max = Math.max(max, dp[0][i]);
+        }
+        for (int i = 1; i < dp.length; i++) {
+            for (int j = 1; j < dp[0].length; j++) {
+                if (matrix[i][j] == '0')
+                    dp[i][j] = 0;
+                else{
+                    dp[i][j] = 1 + Math.min(dp[i-1][j-1],Math.min(dp[i][j-1], dp[i-1][j]));
+                    max = Math.max(max, dp[i][j]);
+                }
+            }
+        }
+        return max * max;
+    }
+
+    /**
+     * Leecode 121. 买卖股票的最佳时机（单次交易）
+     */
+    public int maxProfit(int[] prices) {
+        /**
+         * dp[i][0]表示在第i天之内，没有股票最多会赚多少钱
+         * dp[i][1]表示在第i天之内，持有股票最少会赔多少钱
+         */
+        int[][] dp = new int[2][prices.length];
+        dp[0][0] = 0;
+        dp[1][0] = -prices[0];
+        for (int i = 1; i < prices.length; i++) {
+            dp[0][i] = Math.max(dp[0][i-1], dp[1][i-1] + prices[i]);
+            dp[1][i] = Math.max(dp[1][i-1], -prices[i]);
+        }
+        return dp[0][prices.length-1];
+    }
+
+    /**
+     * Leecode 122. 买卖股票的最佳时机 II（多次交易）/
+     */
+    public int maxProfit1(int[] prices) {
+        int[][] dp = new int[2][prices.length];
+        dp[0][0] = 0;
+        dp[1][0] = - prices[0];
+        for (int i = 1; i <prices.length; i++) {
+            dp[0][i] = Math.max(dp[0][i-1], dp[1][i-1] + prices[i]);
+            dp[1][i] = Math.max(dp[1][i-1], dp[0][i-1] - prices[i]);
+        }
+        return dp[0][prices.length-1];
+    }
+
+    /**
+     * Leecode 714. 买卖股票的最佳时机含手续费（多次交易）
+     */
+    public int maxProfit2(int[] prices, int fee) {
+        int[][] dp = new int[2][prices.length];
+        dp[0][0] = 0;
+        dp[1][0] = - prices[0];
+        for (int i = 1; i <prices.length; i++) {
+            dp[0][i] = Math.max(dp[0][i-1], dp[1][i-1] + prices[i] - fee);
+            dp[1][i] = Math.max(dp[1][i-1], dp[0][i-1] - prices[i]);
+        }
+        return dp[0][prices.length-1];
+    }
+
+    /**
+     * Leecode 309. 买卖股票的最佳时机含冷冻期
+     */
+    public int maxProfit3(int[] prices) {
+        int[][] dp = new int[2][prices.length];
+        dp[0][0] = 0;
+        dp[1][0] = - prices[0];
+        // 多了一组初始化
+        if (prices.length > 1){
+            dp[0][1] = dp[0][1] = Math.max(dp[0][1-1], dp[1][1-1] + prices[1]);;
+            dp[1][1] = Math.max(dp[1][1-1], dp[0][1-1] - prices[1]);
+        }
+
+        for (int i = 2; i <prices.length; i++) {
+            dp[0][i] = Math.max(dp[0][i-1], dp[1][i-1] + prices[i]);
+            dp[1][i] = Math.max(dp[1][i-1], dp[0][i-2] - prices[i]);
+        }
+        return dp[0][prices.length-1];
+    }
+
+    /**
+     * Leecode 139. 单词拆分（难！！）
+     */
+    public boolean wordBreak(String s, List<String> wordDict) {
+        boolean[] dp = new boolean[s.length() + 1];
+        dp[0] = true;
+        for (int i = 1; i <= s.length(); i++) {
+            for (int j = 0; j < i; j++) {
+                if (dp[j] && wordDict.contains(s.substring(j,i))){
+                    dp[i] = true;
+                    break;
+                }
+            }
+        }
+        return dp[dp.length-1];
+    }
+
+    /**
+     * Leecode 198. 打家劫舍
+     */
+    public int rob(int[] nums) {
+        // 盗窃当前下标及之前的所有房屋获得的最大收益
+        int[] dp = new int[nums.length];
+        dp[0] = nums[0];
+        for (int i = 1; i < dp.length; i++) {
+            dp[i] = Math.max(dp[i-1], i-2 >=0 ? nums[i] + dp[i-2] : nums[i]);
+        }
+        return dp[dp.length-1];
+    }
 
 
 
@@ -405,9 +605,7 @@ public class dpProb {
 
     public static void main(String[] args) {
         dpProb dpProb = new dpProb();
-        int[] ints = {1, 2, 5};
-        boolean b = dpProb.canPartition(ints);
-        dpProb.longestPalindromeSubseq("bbbab");
-
+        int[] ints = {7,1,5,3,6,4};
+        dpProb.maxProfit(ints);
     }
 }

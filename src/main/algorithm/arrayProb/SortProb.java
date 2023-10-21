@@ -1,5 +1,6 @@
 package algorithm.arrayProb;
 
+import java.util.Arrays;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -88,6 +89,31 @@ public class SortProb {
     }
 
     /**
+     * Leecode 179. 最大数
+     */
+    public String largestNumber(int[] nums) {
+        // 解法同上
+        Integer[] array = IntStream.of(nums).boxed().toArray(Integer[]::new);
+        Arrays.sort(array, (o1, o2)->{
+            String s1 = o1 + "" + o2;
+            String s2 = o2 + "" + o1;
+            return s1.compareTo(s2) >=0 ? -1 : 1;
+        });
+        String s = "";
+        for (int i = 0; i < array.length; i++) {
+            s += array[i];
+        }
+        // 删掉前导0
+        int i = 0;
+        while (s.length() > 1 && s.charAt(i) == '0' && s.charAt(i + 1)== '0'){
+            s = s.substring(1, s.length());
+        }
+        return s;
+    }
+
+
+
+    /**
      * Leecode 215. 数组中的第K个最大元素
      * 要求：时间复杂度为 O(n)
      */
@@ -171,6 +197,15 @@ public class SortProb {
         quicks(nums, left, l-1);
         quicks(nums, l + 1, right);
     }
+
+    public static void main(String[] args) {
+        SortProb sp = new SortProb();
+        int[] ints = {10,2};
+        String s = sp.largestNumber(ints);
+        System.out.println(s);
+    }
+
+
 
 
 }

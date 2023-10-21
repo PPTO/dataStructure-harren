@@ -3,6 +3,8 @@ package algorithm.arrayProb;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class DfsProb {
     /**
@@ -41,6 +43,8 @@ public class DfsProb {
 
     /**
      * Leecode 78. 子集
+     * 输入：nums = [1,2,3]
+     * 输出：[[],[1],[2],[1,2],[3],[1,3],[2,3],[1,2,3]]
      */
     public List<List<Integer>> subsets(int[] nums) {
         List<Integer> list = new ArrayList<>();
@@ -61,6 +65,16 @@ public class DfsProb {
 
     /**
      * Leecode 77. 组合
+     * 输入：n = 4, k = 2
+     * 输出：
+     * [
+     *   [2,4],
+     *   [3,4],
+     *   [2,3],
+     *   [1,2],
+     *   [1,3],
+     *   [1,4],
+     * ]
      */
     public List<List<Integer>> combine(int n, int k) {
         List<List<Integer>> lists = new ArrayList<>();
@@ -113,6 +127,37 @@ public class DfsProb {
             gp(n, m-1, list, s);
             // 回溯
             s = s.substring(0, s.length()-1);
+        }
+    }
+
+    /**
+     * Leecode 39. 组合总和（难！）
+     */
+    public List<List<Integer>> combinationSum(int[] candidates, int target) {
+        List<List<Integer>> ans = new ArrayList<>();
+        List<Integer> list = new ArrayList<>();
+        cs(candidates, target, 0, list, ans);
+        return ans;
+    }
+
+
+    private void cs(int[] candidates, int target, int start, List<Integer> list, List<List<Integer>> ans){
+        if (target == 0){
+            ans.add(new ArrayList<>(list));
+            return;
+        }
+        if (target < 0)
+            return;
+        for (int i = start; i < candidates.length; i++) {
+            target -= candidates[i];
+            list.add(candidates[i]);
+            /**
+             * Important! 为保证结果的唯一性，start 从 i 开始遍历
+             */
+            cs(candidates, target, i, list, ans);
+            // 回溯
+            target += candidates[i];
+            list.remove(list.size()-1);
         }
     }
 }
